@@ -226,6 +226,10 @@ button:focus-visible { outline: 3px solid var(--rovello); outline-offset: 3px; }
 .share .sh { background: var(--rovello); color: #2a1608; }
 .share .wa { background: #2f7d4a; color: #fff; }
 .shmsg { font-size: 13px; font-weight: 700; color: var(--ok); min-height: 1em; text-align: center; }
+#start { padding-top: 60px; }
+.langs { position: absolute; top: 12px; right: 16px; display: flex; gap: 4px; z-index: 2; background: rgba(247,236,214,.08); border: 1px solid rgba(247,236,214,.16); border-radius: 99px; padding: 3px; }
+.langs button { border: 0; background: none; color: #c9d2b4; font-weight: 800; font-size: 13px; padding: 6px 10px; border-radius: 99px; }
+.langs button[aria-pressed="true"] { background: var(--crema); color: var(--escorca); }
 .linkbtn { background: none; border: 0; color: #c9d2b4; font-weight: 700; font-size: 13.5px; text-decoration: underline; text-underline-offset: 3px; padding: 6px; }
 #credits, #rank { justify-content: flex-start; text-align: left; }
 #rank h2 { font-family: var(--display); font-weight: 800; font-size: 30px; margin: 8px 0 0; }
@@ -266,19 +270,19 @@ button:focus-visible { outline: 3px solid var(--rovello); outline-offset: 3px; }
 <div id="app">
   <header class="hud">
     <div class="brand">Cistella<span>!</span></div>
-    <div class="lives" id="lives" aria-label="Vides"></div>
-    <div class="score"><span id="score">0</span><small id="count">punts</small></div>
+    <div class="lives" id="lives" data-i18n-aria="lives" aria-label="Vides"></div>
+    <div class="score"><span id="score">0</span><small id="count" data-i18n="points">punts</small></div>
   </header>
   <div class="progress"><i id="prog"></i></div>
   <main class="stage" id="stage"></main>
   <div class="flash" id="flash" aria-live="polite"></div>
   <div class="controls">
-    <button class="act no" id="btnNo" aria-label="Deixar-lo al bosc">
+    <button class="act no" id="btnNo" data-i18n-aria="noAria" aria-label="Deixar-lo al bosc">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20C4 8 12 3 21 3c0 9-5 17-17 17z" fill="currentColor"/><path d="M5 19L15 9" stroke="#4a3a26" stroke-width="2" stroke-linecap="round"/></svg>
-      Al bosc
+      <span data-i18n="no">Al bosc</span>
     </button>
-    <button class="act yes" id="btnYes" aria-label="Posar-lo a la cistella">
-      A la cistella
+    <button class="act yes" id="btnYes" data-i18n-aria="yesAria" aria-label="Posar-lo a la cistella">
+      <span data-i18n="yes">A la cistella</span>
       <svg viewBox="0 0 32 28" aria-hidden="true"><path d="M7 12Q16-3 25 12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M3 11h26l-3.5 14h-19z" fill="currentColor"/><path d="M9 14l1 9M16 14v9M23 14l-1 9" stroke="#e07a2e" stroke-width="1.6"/></svg>
     </button>
   </div>
@@ -286,23 +290,24 @@ button:focus-visible { outline: 3px solid var(--rovello); outline-offset: 3px; }
   <section class="sheet" id="sheet" aria-live="polite"></section>
 
   <section class="screen" id="start">
+    <div class="langs" id="langs" role="group" aria-label="Idioma"><button data-l="ca" lang="ca">CA</button><button data-l="es" lang="es">ES</button><button data-l="en" lang="en">EN</button></div>
     <div class="hero" id="hero"></div>
     <h1 class="logo">Cistella<span>!</span></h1>
-    <p class="tag">Aquest bolet, a la cistella o es queda al bosc?</p>
+    <p class="tag" data-i18n="tag">Aquest bolet, a la cistella o es queda al bosc?</p>
     <div class="rules">
-      <div class="rule"><svg viewBox="0 0 32 28" aria-hidden="true"><path d="M7 12Q16-3 25 12" fill="none" stroke="#e07a2e" stroke-width="3" stroke-linecap="round"/><path d="M3 11h26l-3.5 14h-19z" fill="#e07a2e"/></svg>Llisca a la dreta si és comestible.</div>
-      <div class="rule"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20C4 8 12 3 21 3c0 9-5 17-17 17z" fill="#c9a24a"/></svg>A l'esquerra si no ho és, o si dubtes.</div>
-      <div class="rule"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8" fill="none" stroke="#f7ecd6" stroke-width="2.4"/><path d="M12 13V8.5M9.5 2.5h5" stroke="#f7ecd6" stroke-width="2.4" stroke-linecap="round"/></svg>Com més de pressa encertes, més punts.</div>
-      <div class="rule"><svg viewBox="0 0 32 28" aria-hidden="true"><path d="M7 12Q16-3 25 12" fill="none" stroke="#f7ecd6" stroke-width="3" stroke-linecap="round"/><path d="M3 11h26l-3.5 14h-19z" fill="#f7ecd6"/></svg>Tens tres cistelles. Un bolet tòxic te'n fa perdre una.</div>
-      <div class="rule"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="11" r="8" fill="#a3201a"/><circle cx="9" cy="10" r="2" fill="#f7ecd6"/><circle cx="15" cy="10" r="2" fill="#f7ecd6"/><rect x="9" y="17" width="6" height="4" rx="1" fill="#a3201a"/></svg>Un de mortal acaba la partida de cop.</div>
+      <div class="rule"><svg viewBox="0 0 32 28" aria-hidden="true"><path d="M7 12Q16-3 25 12" fill="none" stroke="#e07a2e" stroke-width="3" stroke-linecap="round"/><path d="M3 11h26l-3.5 14h-19z" fill="#e07a2e"/></svg><span data-i18n="r1">Llisca a la dreta si és comestible.</span></div>
+      <div class="rule"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20C4 8 12 3 21 3c0 9-5 17-17 17z" fill="#c9a24a"/></svg><span data-i18n="r2">A l'esquerra si no ho és, o si dubtes.</span></div>
+      <div class="rule"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8" fill="none" stroke="#f7ecd6" stroke-width="2.4"/><path d="M12 13V8.5M9.5 2.5h5" stroke="#f7ecd6" stroke-width="2.4" stroke-linecap="round"/></svg><span data-i18n="r3">Com més de pressa encertes, més punts.</span></div>
+      <div class="rule"><svg viewBox="0 0 32 28" aria-hidden="true"><path d="M7 12Q16-3 25 12" fill="none" stroke="#f7ecd6" stroke-width="3" stroke-linecap="round"/><path d="M3 11h26l-3.5 14h-19z" fill="#f7ecd6"/></svg><span data-i18n="r4">Tens tres cistelles. Un bolet tòxic te'n fa perdre una.</span></div>
+      <div class="rule"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="11" r="8" fill="#a3201a"/><circle cx="9" cy="10" r="2" fill="#f7ecd6"/><circle cx="15" cy="10" r="2" fill="#f7ecd6"/><rect x="9" y="17" width="6" height="4" rx="1" fill="#a3201a"/></svg><span data-i18n="r5">Un de mortal acaba la partida de cop.</span></div>
     </div>
-    <button class="big" id="btnStart">Anem a buscar bolets</button>
+    <button class="big" id="btnStart" data-i18n="start">Anem a buscar bolets</button>
     <div class="podi" id="podi">
-      <h3>Els millors boletaires <button class="linkbtn" id="btnRank3">Veure'l tot</button></h3>
+      <h3><span data-i18n="podiTitle">Els millors boletaires</span> <button class="linkbtn" id="btnRank3" data-i18n="seeAll">Veure'l tot</button></h3>
       <ol id="podiList"><li class="buit" style="display:block">Carregant…</li></ol>
     </div>
-    <p class="disc">És un joc, no una guia. Mai no mengis un bolet identificat amb una pantalla: porta'l a una associació micològica o a un expert.</p>
-    <div class="links"><button class="linkbtn" id="btnRank1">Rànquing</button><button class="linkbtn" id="btnCred1">Crèdits de les fotos</button><button class="linkbtn" id="btnAbout1">Qui som i contacte</button></div>
+    <p class="disc" data-i18n="disc1">És un joc, no una guia. Mai no mengis un bolet identificat amb una pantalla: porta'l a una associació micològica o a un expert.</p>
+    <div class="links"><button class="linkbtn" id="btnRank1" data-i18n="rankLink">Rànquing</button><button class="linkbtn" id="btnCred1" data-i18n="creditsLink">Crèdits de les fotos</button><button class="linkbtn" id="btnAbout1" data-i18n="aboutLink">Qui som i contacte</button></div>
   </section>
 
   <section class="screen" id="end" hidden>
@@ -310,77 +315,361 @@ button:focus-visible { outline: 3px solid var(--rovello); outline-offset: 3px; }
       <h2 id="endTitle">Sense cistelles</h2>
       <p id="endText" style="margin:0;font-size:15px;line-height:1.4"></p>
       <div class="stats">
-        <div class="stat"><b id="stScore">0</b><span>punts</span></div>
-        <div class="stat"><b id="stHits">0</b><span>encerts</span></div>
-        <div class="stat"><b id="stBest">0</b><span>rècord</span></div>
+        <div class="stat"><b id="stScore">0</b><span data-i18n="points">punts</span></div>
+        <div class="stat"><b id="stHits">0</b><span data-i18n="hits">encerts</span></div>
+        <div class="stat"><b id="stBest">0</b><span data-i18n="record">rècord</span></div>
       </div>
       <div class="share">
-        <button class="sh" id="btnShare" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 13v6h14v-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Comparteix</button>
+        <button class="sh" id="btnShare" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 13v6h14v-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="share">Comparteix</span></button>
         <a class="wa" id="btnWa" href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.6-1.2A9 9 0 1 0 12 3z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8.6 8.2c.3-.6.6-.6.9-.6h.6c.2 0 .4 0 .6.5l.8 1.9c.1.2 0 .4-.1.6l-.5.6c-.1.2-.2.3 0 .6.5.8 1.1 1.5 1.9 2 .3.2.5.2.6 0l.7-.8c.2-.2.4-.2.6-.1l1.8.9c.2.1.4.2.4.4 0 .3-.1 1.1-.7 1.6-.6.5-1.6.6-2.8.1-1.6-.6-3.3-2.1-4.3-3.7-.8-1.3-.8-2.6-.5-3z" fill="currentColor"/></svg>WhatsApp</a>
       </div>
       <div class="shmsg" id="shMsg" role="status"></div>
       <div>
-        <div style="font-size:13px;font-weight:800;margin-bottom:6px">Apunta't al rànquing</div>
+        <div style="font-size:13px;font-weight:800;margin-bottom:6px" data-i18n="joinRank">Apunta't al rànquing</div>
         <form class="save" id="saveForm">
-          <input id="nom" maxlength="16" placeholder="El teu nom" autocomplete="nickname" aria-label="El teu nom">
-          <button id="btnSave" type="submit">Desa</button>
+          <input id="nom" maxlength="16" placeholder="El teu nom" data-i18n-ph="yourName" data-i18n-aria="yourName" autocomplete="nickname" aria-label="El teu nom">
+          <button id="btnSave" type="submit" data-i18n="save">Desa</button>
         </form>
         <div class="saved" id="savedMsg"></div>
       </div>
       <div id="mortalWrap">
-        <div style="font-size:13px;font-weight:800;margin-bottom:6px">Els que maten, i ja els has vist:</div>
+        <div style="font-size:13px;font-weight:800;margin-bottom:6px" data-i18n="killersSeen">Els que maten, i ja els has vist:</div>
         <div class="mortals" id="mortalList"></div>
       </div>
     </div>
-    <button class="big" id="btnAgain">Torna al bosc</button>
-    <div class="ad" role="note">Espai per a anunci<small>Prototip: aquí aniria el bàner d'AdSense o AdMob</small></div>
-    <div class="links"><button class="linkbtn" id="btnRank2">Rànquing</button><button class="linkbtn" id="btnCred2">Crèdits de les fotos</button><button class="linkbtn" id="btnAbout2">Qui som i contacte</button></div>
-    <p class="disc">Il·lustracions orientatives. Per identificar bolets cal veure'ls en mà: olor, làtex, base del peu, color en tallar-los.</p>
+    <button class="big" id="btnAgain" data-i18n="again">Torna al bosc</button>
+    <div class="ad" role="note"><span data-i18n="adSpace">Espai per a anunci</span><small data-i18n="adSmall">Prototip: aquí aniria el bàner d'AdSense o AdMob</small></div>
+    <div class="links"><button class="linkbtn" id="btnRank2" data-i18n="rankLink">Rànquing</button><button class="linkbtn" id="btnCred2" data-i18n="creditsLink">Crèdits de les fotos</button><button class="linkbtn" id="btnAbout2" data-i18n="aboutLink">Qui som i contacte</button></div>
+    <p class="disc" data-i18n="disc2">Il·lustracions orientatives. Per identificar bolets cal veure'ls en mà: olor, làtex, base del peu, color en tallar-los.</p>
   </section>
   <section class="screen" id="rank" hidden>
-    <h2>Rànquing</h2>
+    <h2 data-i18n="rankTitle">Rànquing</h2>
     <div class="tabs" id="rankTabs">
-      <button data-t="global" aria-pressed="true">Tothom</button>
-      <button data-t="local" aria-pressed="false">Aquest mòbil</button>
+      <button data-t="global" aria-pressed="true" data-i18n="tabAll">Tothom</button>
+      <button data-t="local" aria-pressed="false" data-i18n="tabLocal">Aquest mòbil</button>
     </div>
     <ol class="rlist" id="rlist"></ol>
-    <button class="big" id="btnRankClose">Tanca</button>
+    <button class="big" id="btnRankClose" data-i18n="close">Tanca</button>
   </section>
 
   <section class="screen" id="about" hidden>
-    <h2>Qui som</h2>
-    <p>Cistella! és un joc fet a Valls per Francesc, que fa projectes digitals i audiovisuals.</p>
-    <p>Si organitzes una fira del bolet, formes part d'una associació o tens un projecte on encaixaria un joc com aquest, escriu-me. També m'és molt útil saber si has trobat alguna errada en un bolet o en una foto.</p>
-    <p>Escriu-me a <a id="cEmail" style="color:#f0b45a;font-weight:800;word-break:break-all" href="#">(activa JavaScript per veure el correu)</a> o fes servir aquest formulari:</p>
+    <h2 data-i18n="aboutTitle">Qui som</h2>
+    <p data-i18n="about1">Cistella! és un joc fet a Valls per Francesc, que fa projectes digitals i audiovisuals.</p>
+    <p data-i18n="about2">Si organitzes una fira del bolet, formes part d'una associació o tens un projecte on encaixaria un joc com aquest, escriu-me. També m'és molt útil saber si has trobat alguna errada en un bolet o en una foto.</p>
+    <p><span data-i18n="about3a">Escriu-me a</span> <a id="cEmail" style="color:#f0b45a;font-weight:800;word-break:break-all" href="#">(activa JavaScript per veure el correu)</a> <span data-i18n="about3b">o fes servir aquest formulari:</span></p>
     <form class="cform" id="cform" novalidate>
-      <label for="cNom">Nom <small>(opcional)</small><input id="cNom" maxlength="60" autocomplete="name"></label>
-      <label for="cMail">Correu, si vols resposta <small>(opcional)</small><input id="cMail" type="email" maxlength="120" autocomplete="email"></label>
-      <label for="cText">Missatge<textarea id="cText" maxlength="1500" required></textarea></label>
+      <label for="cNom"><span><span data-i18n="fName">Nom</span> <small data-i18n="optional">(opcional)</small></span><input id="cNom" maxlength="60" autocomplete="name"></label>
+      <label for="cMail"><span><span data-i18n="fMail">Correu, si vols resposta</span> <small data-i18n="optional">(opcional)</small></span><input id="cMail" type="email" maxlength="120" autocomplete="email"></label>
+      <label for="cText"><span data-i18n="fMsg">Missatge</span><textarea id="cText" maxlength="1500" required></textarea></label>
       <div class="hp" aria-hidden="true"><label for="cWeb">Web<input id="cWeb" tabindex="-1" autocomplete="off"></label></div>
-      <small>El correu només es farà servir per respondre't.</small>
-      <button class="send" id="cSend" type="submit">Envia el missatge</button>
+      <small data-i18n="fNote">El correu només es farà servir per respondre't.</small>
+      <button class="send" id="cSend" type="submit" data-i18n="fSend">Envia el missatge</button>
       <div class="cmsg" id="cMsg" role="status"></div>
     </form>
-    <button class="big" id="btnAboutClose">Tanca</button>
+    <button class="big" id="btnAboutClose" data-i18n="close">Tanca</button>
   </section>
 
   <section class="screen" id="credits" hidden>
-    <h2>Crèdits</h2>
-    <p class="intro">Les fotos són de persones que les comparteixen amb llicències lliures a iNaturalist i Wikimedia Commons. Gràcies! Al joc es mostren retallades per encaixar a la targeta.</p>
+    <h2 data-i18n="creditsTitle">Crèdits</h2>
+    <p class="intro" data-i18n="creditsIntro">Les fotos són de persones que les comparteixen amb llicències lliures a iNaturalist i Wikimedia Commons. Gràcies! Al joc es mostren retallades per encaixar a la targeta.</p>
     <ul class="clist" id="clist"></ul>
-    <button class="big" id="btnCredClose">Tanca</button>
+    <button class="big" id="btnCredClose" data-i18n="close">Tanca</button>
   </section>
 </div>
 
 <script>
+/* ------------------ Idiomes ------------------ */
+const I18N = {
+  ca: {
+    lives: "Vides", points: "punts", hits: "encerts", record: "rècord",
+    noAria: "Deixar-lo al bosc", yesAria: "Posar-lo a la cistella", no: "Al bosc", yes: "A la cistella",
+    stampYes: "CISTELLA", stampNo: "AL BOSC",
+    tag: "Aquest bolet, a la cistella o es queda al bosc?",
+    r1: "Llisca a la dreta si és comestible.", r2: "A l'esquerra si no ho és, o si dubtes.",
+    r3: "Com més de pressa encertes, més punts.", r4: "Tens tres cistelles. Un bolet tòxic te'n fa perdre una.",
+    r5: "Un de mortal acaba la partida de cop.",
+    start: "Anem a buscar bolets", podiTitle: "Els millors boletaires", seeAll: "Veure'l tot", loading: "Carregant…",
+    disc1: "És un joc, no una guia. Mai no mengis un bolet identificat amb una pantalla: porta'l a una associació micològica o a un expert.",
+    rankLink: "Rànquing", creditsLink: "Crèdits de les fotos", aboutLink: "Qui som i contacte",
+    share: "Comparteix", joinRank: "Apunta't al rànquing", yourName: "El teu nom", save: "Desa",
+    killersSeen: "Els que maten, i ja els has vist:", again: "Torna al bosc",
+    adSpace: "Espai per a anunci", adSmall: "Prototip: aquí aniria el bàner d'AdSense o AdMob",
+    disc2: "Il·lustracions orientatives. Per identificar bolets cal veure'ls en mà: olor, làtex, base del peu, color en tallar-los.",
+    rankTitle: "Rànquing", tabAll: "Tothom", tabLocal: "Aquest mòbil", close: "Tanca",
+    aboutTitle: "Qui som",
+    about1: "Cistella! és un joc fet a Valls per Francesc, que fa projectes digitals i audiovisuals.",
+    about2: "Si organitzes una fira del bolet, formes part d'una associació o tens un projecte on encaixaria un joc com aquest, escriu-me. També m'és molt útil saber si has trobat alguna errada en un bolet o en una foto.",
+    about3a: "Escriu-me a", about3b: "o fes servir aquest formulari:",
+    fName: "Nom", optional: "(opcional)", fMail: "Correu, si vols resposta", fMsg: "Missatge",
+    fNote: "El correu només es farà servir per respondre't.", fSend: "Envia el missatge",
+    creditsTitle: "Crèdits",
+    creditsIntro: "Les fotos són de persones que les comparteixen amb llicències lliures a iNaturalist i Wikimedia Commons. Gràcies! Al joc es mostren retallades per encaixar a la targeta.",
+    cat_comestible: "Comestible", cat_nocomestible: "No comestible", cat_toxic: "Tòxic", cat_mortal: "Mortal",
+    vYes: "A la cistella!", vBitter: "Sopar amarg", vTox: "Mal de panxa", vDead: "Cistella enverinada",
+    vLeftGood: "S'ha quedat al bosc", vSaved: "Ben fet, t'has salvat", vGood: "Bona decisió", vSeen: "Ben vist",
+    subLeft: "Prudent, però t'has perdut un bon sopar.", subLife: "Perds una cistella.",
+    subDead: "Un sol error així pot ser mortal. Fi de la jornada.", subBitter: "No et farà mal, però amarga com el fel.",
+    plusPts: n => `+${n} punts`, streakOf: n => `ratxa de ${n}`, confWith: "Es confon amb:", photo: "Foto:",
+    next: "Següent bolet", seeResult: "Veure el resultat",
+    tap: "Toca per continuar", why: "Amb què es confon?", fast: n => `Ràpid! +${n} de bonificació`, streakX: n => `Ratxa x${n}`,
+    tuto: "Arrossega la targeta o fes servir els botons.", photoAlt: "Foto d'un bolet", illusAlt: "Il·lustració d'un bolet",
+    tPoison: "Intoxicació!", tNoBaskets: "Sense cistelles", tPerfect: "Jornada perfecta!", tDone: "Has recorregut tot el bosc",
+    ePoison: "Has posat a la cistella un bolet mortal. Al bosc, quan dubtis, deixa'l on és.",
+    eDone: (n, h, b, p) => `Has vist els ${n} bolets i n'has encertat ${h}, amb una ratxa màxima de ${b}.${p ? " Ara, a fer-ho més ràpid!" : ""}`,
+    ePartial: (n, h, b) => `Has fet ${h} encerts de ${n} bolets, amb una ratxa màxima de ${b}.`,
+    rankLoadFail: "No s'ha pogut carregar el rànquing.", rankEmpty: "Encara no hi ha ningú. Sigues el primer!",
+    localEmpty: "Encara no hi ha cap partida desada en aquest mòbil.",
+    noFirebase: "El rànquing de tothom s'activa quan el joc està connectat a Firebase.",
+    rankFailConn: "No s'ha pogut carregar el rànquing. Comprova la connexió.",
+    needName: "Escriu un nom per apuntar-te.", zero: "Amb 0 punts no s'apunta al rànquing.",
+    saved: "Desat al rànquing!", savedLocalFail: "Desat en aquest mòbil. El rànquing de tothom no respon ara.",
+    savedLocal: "Desat al rànquing d'aquest mòbil.",
+    shPerfect: (n, s) => `Jornada perfecta a Cistella!: ${n}/${n} bolets i ${s} punts 🧺`,
+    shKilled: s => `He acabat intoxicat a Cistella! amb ${s} punts 😵`,
+    shNormal: (s, h, n) => `He fet ${s} punts a Cistella! (${h}/${n} bolets) 🧺`,
+    shLine2: "Saps distingir un rovelló d'una farinera borda? 🍄",
+    copied: "Copiat! Enganxa-ho on vulguis.", shareFail: "No s'ha pogut compartir des d'aquí. Prova el botó de WhatsApp.",
+    cEmpty: "Escriu el missatge abans d'enviar-lo.", cBadMail: "Revisa l'adreça de correu: sembla que no és correcta.",
+    cSending: "Enviant…", cSent: "Missatge enviat. Gràcies!", cFail: "No s'ha pogut enviar. Comprova la connexió i torna-ho a provar.",
+    publicDomain: "Domini públic", creditCC0: "domini públic (CC0)", originalAt: "foto original a",
+    illusNote: "Els bolets sense foto es mostren amb il·lustracions pròpies del joc.",
+    allIllus: "Totes les imatges d'aquesta versió són il·lustracions pròpies del joc.",
+    langLabel: "Idioma"
+  },
+  es: {
+    lives: "Vidas", points: "puntos", hits: "aciertos", record: "récord",
+    noAria: "Dejarla en el bosque", yesAria: "Ponerla en la cesta", no: "Al bosque", yes: "A la cesta",
+    stampYes: "CESTA", stampNo: "AL BOSQUE",
+    tag: "Esta seta, ¿a la cesta o se queda en el bosque?",
+    r1: "Desliza a la derecha si es comestible.", r2: "A la izquierda si no lo es, o si dudas.",
+    r3: "Cuanto más rápido aciertes, más puntos.", r4: "Tienes tres cestas. Una seta tóxica te hace perder una.",
+    r5: "Una mortal acaba la partida de golpe.",
+    start: "¡A buscar setas!", podiTitle: "Los mejores seteros", seeAll: "Ver todo", loading: "Cargando…",
+    disc1: "Es un juego, no una guía. Nunca comas una seta identificada con una pantalla: llévala a una asociación micológica o a un experto.",
+    rankLink: "Ranking", creditsLink: "Créditos de las fotos", aboutLink: "Quiénes somos y contacto",
+    share: "Compartir", joinRank: "Apúntate al ranking", yourName: "Tu nombre", save: "Guardar",
+    killersSeen: "Las que matan, y ya las has visto:", again: "Volver al bosque",
+    adSpace: "Espacio para anuncio", adSmall: "Prototipo: aquí iría el banner de AdSense o AdMob",
+    disc2: "Ilustraciones orientativas. Para identificar setas hay que verlas en mano: olor, látex, base del pie, color al cortarlas.",
+    rankTitle: "Ranking", tabAll: "Todos", tabLocal: "Este móvil", close: "Cerrar",
+    aboutTitle: "Quiénes somos",
+    about1: "Cistella! (cesta, en catalán) es un juego hecho en Valls por Francesc, que hace proyectos digitales y audiovisuales.",
+    about2: "Si organizas una feria micológica, formas parte de una asociación o tienes un proyecto en el que encajaría un juego como este, escríbeme. También me ayuda mucho saber si has encontrado algún error en una seta o en una foto.",
+    about3a: "Escríbeme a", about3b: "o usa este formulario:",
+    fName: "Nombre", optional: "(opcional)", fMail: "Correo, si quieres respuesta", fMsg: "Mensaje",
+    fNote: "El correo solo se usará para responderte.", fSend: "Enviar mensaje",
+    creditsTitle: "Créditos",
+    creditsIntro: "Las fotos son de personas que las comparten con licencias libres en iNaturalist y Wikimedia Commons. ¡Gracias! En el juego se muestran recortadas para encajar en la tarjeta.",
+    cat_comestible: "Comestible", cat_nocomestible: "No comestible", cat_toxic: "Tóxica", cat_mortal: "Mortal",
+    vYes: "¡A la cesta!", vBitter: "Cena amarga", vTox: "Dolor de barriga", vDead: "Cesta envenenada",
+    vLeftGood: "Se ha quedado en el bosque", vSaved: "Bien hecho, te has salvado", vGood: "Buena decisión", vSeen: "Bien visto",
+    subLeft: "Prudente, pero te has perdido una buena cena.", subLife: "Pierdes una cesta.",
+    subDead: "Un solo error así puede ser mortal. Fin de la jornada.", subBitter: "No te hará daño, pero amarga como la hiel.",
+    plusPts: n => `+${n} puntos`, streakOf: n => `racha de ${n}`, confWith: "Se confunde con:", photo: "Foto:",
+    next: "Siguiente seta", seeResult: "Ver el resultado",
+    tap: "Toca para continuar", why: "¿Con qué se confunde?", fast: n => `¡Rápido! +${n} de bonificación`, streakX: n => `Racha x${n}`,
+    tuto: "Arrastra la tarjeta o usa los botones.", photoAlt: "Foto de una seta", illusAlt: "Ilustración de una seta",
+    tPoison: "¡Intoxicación!", tNoBaskets: "Sin cestas", tPerfect: "¡Jornada perfecta!", tDone: "Has recorrido todo el bosque",
+    ePoison: "Has puesto una seta mortal en la cesta. En el bosque, si dudas, déjala donde está.",
+    eDone: (n, h, b, p) => `Has visto las ${n} setas y has acertado ${h}, con una racha máxima de ${b}.${p ? " ¡Ahora, a hacerlo más rápido!" : ""}`,
+    ePartial: (n, h, b) => `Has acertado ${h} de ${n} setas, con una racha máxima de ${b}.`,
+    rankLoadFail: "No se ha podido cargar el ranking.", rankEmpty: "Todavía no hay nadie. ¡Sé el primero!",
+    localEmpty: "Todavía no hay ninguna partida guardada en este móvil.",
+    noFirebase: "El ranking general se activa cuando el juego está conectado a Firebase.",
+    rankFailConn: "No se ha podido cargar el ranking. Comprueba la conexión.",
+    needName: "Escribe un nombre para apuntarte.", zero: "Con 0 puntos no se entra en el ranking.",
+    saved: "¡Guardado en el ranking!", savedLocalFail: "Guardado en este móvil. El ranking general no responde ahora.",
+    savedLocal: "Guardado en el ranking de este móvil.",
+    shPerfect: (n, s) => `¡Jornada perfecta en Cistella!: ${n}/${n} setas y ${s} puntos 🧺`,
+    shKilled: s => `He acabado intoxicado en Cistella! con ${s} puntos 😵`,
+    shNormal: (s, h, n) => `He hecho ${s} puntos en Cistella! (${h}/${n} setas) 🧺`,
+    shLine2: "¿Sabes distinguir un níscalo de una oronja verde? 🍄",
+    copied: "¡Copiado! Pégalo donde quieras.", shareFail: "No se ha podido compartir desde aquí. Prueba el botón de WhatsApp.",
+    cEmpty: "Escribe el mensaje antes de enviarlo.", cBadMail: "Revisa la dirección de correo: parece que no es correcta.",
+    cSending: "Enviando…", cSent: "Mensaje enviado. ¡Gracias!", cFail: "No se ha podido enviar. Comprueba la conexión y vuelve a intentarlo.",
+    publicDomain: "Dominio público", creditCC0: "dominio público (CC0)", originalAt: "foto original en",
+    illusNote: "Las setas sin foto se muestran con ilustraciones propias del juego.",
+    allIllus: "Todas las imágenes de esta versión son ilustraciones propias del juego.",
+    langLabel: "Idioma"
+  },
+  en: {
+    lives: "Lives", points: "points", hits: "correct", record: "best",
+    noAria: "Leave it in the forest", yesAria: "Put it in the basket", no: "Leave it", yes: "Basket",
+    stampYes: "BASKET", stampNo: "LEAVE IT",
+    tag: "Into the basket, or leave it in the forest?",
+    r1: "Swipe right if it's edible.", r2: "Swipe left if it isn't, or if you're not sure.",
+    r3: "The faster you get it right, the more points.", r4: "You have three baskets. A toxic mushroom costs you one.",
+    r5: "A deadly one ends the game on the spot.",
+    start: "Let's go foraging", podiTitle: "Top foragers", seeAll: "See all", loading: "Loading…",
+    disc1: "This is a game, not a field guide. Never eat a mushroom identified on a screen: take it to a mycological society or an expert.",
+    rankLink: "Leaderboard", creditsLink: "Photo credits", aboutLink: "About & contact",
+    share: "Share", joinRank: "Add your score", yourName: "Your name", save: "Save",
+    killersSeen: "The deadly ones you've now seen:", again: "Back to the forest",
+    adSpace: "Ad space", adSmall: "Prototype: an AdSense or AdMob banner would go here",
+    disc2: "Illustrations are only a guide. To identify mushrooms you need them in your hand: smell, milk, stem base, colour when cut.",
+    rankTitle: "Leaderboard", tabAll: "Everyone", tabLocal: "This device", close: "Close",
+    aboutTitle: "About",
+    about1: "Cistella! (Catalan for “basket”) is a game made in Valls, Catalonia, by Francesc, who works on digital and audiovisual projects. The mushrooms are the ones found in Catalan forests.",
+    about2: "If you run a mushroom fair, belong to a mycological society or have a project where a game like this would fit, get in touch. It also helps a lot to hear about any mistake in a mushroom or a photo.",
+    about3a: "Write to me at", about3b: "or use this form:",
+    fName: "Name", optional: "(optional)", fMail: "Email, if you'd like a reply", fMsg: "Message",
+    fNote: "Your email will only be used to reply to you.", fSend: "Send message",
+    creditsTitle: "Credits",
+    creditsIntro: "The photos come from people who share them under free licences on iNaturalist and Wikimedia Commons. Thank you! In the game they're cropped to fit the card.",
+    cat_comestible: "Edible", cat_nocomestible: "Not edible", cat_toxic: "Toxic", cat_mortal: "Deadly",
+    vYes: "Into the basket!", vBitter: "Bitter dinner", vTox: "Tummy ache", vDead: "Poisoned basket",
+    vLeftGood: "Left in the forest", vSaved: "Well done, close call", vGood: "Good call", vSeen: "Nice spot",
+    subLeft: "Cautious, but you missed a good dinner.", subLife: "You lose a basket.",
+    subDead: "One mistake like this can kill. Game over.", subBitter: "It won't hurt you, but it's bitter as bile.",
+    plusPts: n => `+${n} points`, streakOf: n => `streak of ${n}`, confWith: "Easily confused with:", photo: "Photo:",
+    next: "Next mushroom", seeResult: "See results",
+    tap: "Tap to continue", why: "What's it confused with?", fast: n => `Quick! +${n} bonus`, streakX: n => `Streak x${n}`,
+    tuto: "Drag the card or use the buttons.", photoAlt: "Photo of a mushroom", illusAlt: "Illustration of a mushroom",
+    tPoison: "Poisoned!", tNoBaskets: "Out of baskets", tPerfect: "Perfect day!", tDone: "You've covered the whole forest",
+    ePoison: "You put a deadly mushroom in your basket. In the forest: when in doubt, leave it out.",
+    eDone: (n, h, b, p) => `You saw all ${n} mushrooms and got ${h} right, with a best streak of ${b}.${p ? " Now do it faster!" : ""}`,
+    ePartial: (n, h, b) => `You got ${h} of ${n} mushrooms right, with a best streak of ${b}.`,
+    rankLoadFail: "Couldn't load the leaderboard.", rankEmpty: "Nobody here yet. Be the first!",
+    localEmpty: "No games saved on this device yet.",
+    noFirebase: "The global leaderboard turns on when the game is connected to Firebase.",
+    rankFailConn: "Couldn't load the leaderboard. Check your connection.",
+    needName: "Type a name to add your score.", zero: "A score of 0 can't go on the leaderboard.",
+    saved: "Added to the leaderboard!", savedLocalFail: "Saved on this device. The global leaderboard isn't responding right now.",
+    savedLocal: "Saved to this device's leaderboard.",
+    shPerfect: (n, s) => `Perfect day in Cistella!: ${n}/${n} mushrooms and ${s} points 🧺`,
+    shKilled: s => `I got poisoned in Cistella! with ${s} points 😵`,
+    shNormal: (s, h, n) => `I scored ${s} points in Cistella! (${h}/${n} mushrooms) 🧺`,
+    shLine2: "Can you tell a chanterelle from a death cap? 🍄",
+    copied: "Copied! Paste it wherever you like.", shareFail: "Couldn't share from here. Try the WhatsApp button.",
+    cEmpty: "Write your message before sending it.", cBadMail: "Check your email address: it doesn't look right.",
+    cSending: "Sending…", cSent: "Message sent. Thank you!", cFail: "Couldn't send it. Check your connection and try again.",
+    publicDomain: "Public domain", creditCC0: "public domain (CC0)", originalAt: "original photo on",
+    illusNote: "Mushrooms without a photo are shown with the game's own illustrations.",
+    allIllus: "All the images in this version are the game's own illustrations.",
+    langLabel: "Language"
+  }
+};
+
+/* Noms, pistes i textos dels bolets en castellà i anglès: [nom, [pistes], text] */
+const TR = {
+  es: {
+    rovello: ["Rovellón", ["Pinares de zonas bajas", "Otoño", "Sombrero de 5–12 cm"], "Al cortarla suelta un látex de color vino. Sombrero en forma de embudo con círculos concéntricos; se mancha de verde y el pie tiene hoyitos."],
+    torminosus: ["Falso níscalo", ["Junto a abedules", "Otoño", "Sombrero de 4–10 cm"], "Provoca fuertes trastornos digestivos. El borde del sombrero es peludo y el látex es blanco, nunca rojo vino ni naranja."],
+    cep: ["Boleto", ["Pinares y hayedos", "Verano y otoño", "Sombrero de 8–25 cm"], "Comestible excelente. Poros blanquecinos o amarillentos, nunca rojos, y pie grueso con una red fina y clara."],
+    mataparent: ["Boleto de Satanás", ["Encinares y robledales", "Verano y otoño", "Sombrero de 10–30 cm"], "Provoca vómitos intensos. Sombrero blanquecino, poros rojos, pie panzudo rojizo y carne que se vuelve azul al cortarla."],
+    tylopilus: ["Boleto amargo", ["Pinares", "Verano y otoño", "Sombrero de 6–15 cm"], "No es peligroso, pero es tan amargo que estropea cualquier plato. Poros rosados y red oscura en el pie."],
+    oureig: ["Oronja", ["Encinares y castañares", "Final del verano", "Sombrero de 8–20 cm"], "Muy apreciada. Sombrero naranja, láminas y pie amarillos, y una volva blanca en la base. No la cojas nunca cuando aún es un huevo cerrado: por dentro podría ser una oronja verde."],
+    reigbord: ["Matamoscas", ["Pinares y abedulares", "Otoño", "Sombrero de 8–20 cm"], "Sombrero rojo con verrugas blancas y láminas blancas. La lluvia puede lavarle las verrugas y hacer que parezca una oronja."],
+    farinera: ["Oronja verde", ["Encinares y robledales", "Otoño", "Sombrero de 5–15 cm"], "Causa la mayoría de muertes por setas. Sombrero verde oliva, láminas blancas, anillo y una volva en forma de saco. Los síntomas llegan horas después, cuando el hígado ya está dañado."],
+    llora: ["Rúsula verde", ["Encinares y robledales", "Verano y otoño", "Sombrero de 5–12 cm"], "Comestible, pero solo para expertos. Sombrero verde con la piel agrietada, sin anillo ni volva. Confundirla con una oronja verde puede ser mortal."],
+    rossinyol: ["Rebozuelo", ["Encinares y pinares", "Verano y otoño", "Sombrero de 3–10 cm"], "No tiene láminas de verdad, sino pliegues gruesos que bajan por el pie. Huele a fruta, a albaricoque."],
+    omphalotus: ["Seta del olivo", ["Tocones de olivo y encina", "Otoño", "En grupos"], "Provoca vómitos y diarreas. Crece en grupos sobre madera, tocones o raíces, y tiene láminas de verdad, finas y apretadas."],
+    girgola: ["Seta de ostra", ["Troncos de chopo y plátano", "Otoño e invierno", "Abanicos de 5–15 cm"], "Crece en abanicos superpuestos sobre troncos. Láminas blancas que bajan hasta un pie muy corto o inexistente."],
+    apagallums: ["Parasol", ["Prados y claros", "Otoño", "Sombrero de 15–30 cm"], "Puede superar los 25 cm. Tiene un anillo doble que se mueve arriba y abajo y el pie atigrado. Regla de oro: ninguna lepiota pequeña."],
+    brunneo: ["Lepiota brunneoincarnata", ["Prados, parques y jardines", "Otoño", "Sombrero de 3–5 cm"], "Tiene la misma toxina que la oronja verde. Parece un parasol en miniatura, con escamas rosadas. No comas nunca una lepiota de menos de 10 cm."],
+    fredolic: ["Negrilla", ["Pinares", "Final del otoño", "Sombrero de 3–7 cm"], "Pequeña, gris ratón y de tacto aterciopelado. Sale en grupos en los pinares cuando ya hace frío."],
+    pardinum: ["Tricoloma atigrado", ["Bosques de montaña", "Otoño", "Sombrero de 6–15 cm"], "Provoca una gastroenteritis fuerte. Es más grande y robusta que la negrilla, con escamas gris oscuro sobre fondo claro."],
+    orellanus: ["Cortinarius orellanus", ["Encinares y robledales", "Otoño", "Sombrero de 3–8 cm"], "Destruye los riñones. Los síntomas pueden tardar de dos días a tres semanas, y cuando llegan el daño ya está hecho. Láminas color óxido."],
+    camperol: ["Champiñón silvestre", ["Prados con ganado", "Primavera y otoño", "Sombrero de 4–10 cm"], "Láminas rosadas que se vuelven marrón chocolate. No tiene volva y no amarillea al frotarlo."],
+    xanthodermus: ["Champiñón amarilleante", ["Parques, jardines y cunetas", "Otoño", "Sombrero de 5–15 cm"], "Si frotas la base del pie se vuelve amarillo intenso, y huele a tinta o a yodo. Provoca trastornos digestivos."],
+    verna: ["Oronja blanca", ["Encinares y robledales", "Primavera", "Sombrero de 4–10 cm"], "Toda blanca, con anillo y volva en saco. Tiene las mismas toxinas que la oronja verde. Una seta blanca con volva no se coge nunca."],
+    pantherina: ["Amanita pantera", ["Encinares y pinares", "Verano y otoño", "Sombrero de 5–12 cm"], "Puede causar una intoxicación grave. Sombrero marrón con verrugas blancas y borde estriado; en la base, una volva en forma de collar."],
+    moixerno: ["Seta de San Jorge", ["Prados y lindes", "Primavera", "Sombrero de 5–15 cm"], "Sale en primavera, a menudo en corros en los prados. Carnosa y blanco crema, con láminas blancas muy apretadas y un fuerte olor a harina."],
+    entoloma: ["Entoloma sinuatum", ["Robledales y hayedos", "Otoño", "Sombrero de 8–20 cm"], "Provoca una gastroenteritis muy fuerte que puede durar días. También huele a harina, como la seta de San Jorge, pero sale en otoño y sus láminas, amarillentas, se vuelven rosadas."],
+    camasec: ["Senderuela", ["Prados", "Primavera y otoño", "Sombrero de 2–5 cm"], "Crece en corros en los prados. El pie es fino y elástico: puedes retorcerlo sin que se rompa. Láminas separadas."],
+    dealbata: ["Clitocybe dealbata", ["Prados y céspedes", "Verano y otoño", "Sombrero de 2–4 cm"], "Contiene muscarina: sudores, salivación y vómitos poco después de comerla. Es pequeña y blanquecina, y crece en los mismos prados que la senderuela."],
+    murgola: ["Colmenilla", ["Bosques de ribera y quemados", "Primavera", "5–15 cm de alto"], "Comestible solo bien cocinada: cruda es tóxica. El sombrero tiene alvéolos como un panal y, si la cortas, está toda hueca por dentro."],
+    gyromitra: ["Falsa colmenilla", ["Pinares de montaña", "Primavera", "Sombrero de 4–12 cm"], "Puede ser mortal, incluso cocinada. El sombrero no tiene alvéolos: está arrugado y retorcido como un cerebro, y por dentro tiene cámaras irregulares."],
+    pinetell: ["Níscalo", ["Pinares de montaña", "Otoño", "Sombrero de 5–12 cm"], "Pariente del rovellón, pero más claro, ocre anaranjado, y con un látex color zanahoria, no vino. También se mancha de verde."],
+    llenega: ["Llanega negra", ["Pinares en suelo calizo", "Final del otoño e invierno", "Sombrero de 5–15 cm"], "Sombrero gris oscuro y pie cubierto de una capa viscosa, como mocos. Sale con el frío y aguanta las primeras heladas."],
+    tinta: ["Barbuda", ["Prados y bordes de caminos", "Otoño", "Sombrero de 5–15 cm de alto"], "Comestible solo joven, cuando las láminas aún son blancas. En pocas horas se deshace en un líquido negro, como tinta."],
+    atramentaria: ["Coprino entintado", ["Jardines y bordes de caminos", "Primavera y otoño", "Sombrero de 3–7 cm"], "Con alcohol provoca una intoxicación fuerte: rojez, palpitaciones y vómitos, incluso si bebes unos días después de comerlo."],
+    galerina: ["Galerina marginata", ["Tocones y madera muerta", "Otoño", "Sombrero de 2–5 cm"], "Tiene las mismas toxinas que la oronja verde. Es pequeña, marrón, con un anillo fino en el pie, y crece en grupos sobre tocones, como algunas setas comestibles de tocón."],
+    hypholoma: ["Hifoloma de láminas verdes", ["Tocones y raíces", "Casi todo el año", "Sombrero de 2–6 cm"], "Amarillo azufre, en grupos apretados sobre tocones. Láminas verdosas y sabor muy amargo. Provoca trastornos digestivos."],
+    pimpinella: ["Pie azul", ["Hojarasca de bosques", "Otoño e invierno", "Sombrero de 5–15 cm"], "Tiene tonos lila o violeta, sobre todo en las láminas y el pie, y huele a fruta. Comestible solo bien cocinada."],
+    carlet: ["Higróforo rojo vinoso", ["Encinares y robledales", "Otoño", "Sombrero de 5–12 cm"], "Sombrero robusto de color rojo vinoso, láminas blancas que se manchan de vino y carne firme. Sale en grupos bajo encinas y robles."],
+    emetica: ["Rúsula emética", ["Pinares húmedos y musgo", "Verano y otoño", "Sombrero de 4–9 cm"], "Provoca vómitos. Sombrero rojo vivo y láminas y pie blancos y frágiles. Tiene un sabor muy picante: muchas rúsulas rojas no son comestibles."],
+    nebularis: ["Pardilla", ["Hojarasca de bosques", "Otoño", "Sombrero de 8–20 cm"], "Antes se comía, pero hoy se desaconseja: provoca trastornos digestivos a mucha gente. Sombrero gris ceniza, láminas crema y olor fuerte."],
+    inocybe: ["Inocybe erubescens", ["Parques y bosques de frondosas", "Primavera", "Sombrero de 3–8 cm"], "Puede ser muy grave: tiene mucha muscarina. Sale en primavera como la seta de San Jorge, pero el sombrero es fibroso, acabado en punta, y se mancha de rojo."],
+    bolaneu: ["Bola de nieve", ["Prados y claros", "Otoño", "Sombrero de 8–20 cm"], "Blanca, grande y con un anillo ancho. Huele a anís y amarillea lentamente al frotarla. Si huele a tinta o a yodo, no la cojas."],
+    paxillus: ["Paxilo enrollado", ["Bosques húmedos", "Verano y otoño", "Sombrero de 5–12 cm"], "Durante años se comió, hasta que se vio que puede provocar una reacción inmunitaria mortal, incluso cocinado. Borde enrollado hacia dentro y láminas que se manchan de marrón al tocarlas."],
+    petllop: ["Pedo de lobo", ["Bosques y prados", "Verano y otoño", "3–6 cm"], "Comestible solo joven, si por dentro es blanco y uniforme. Córtalo siempre de arriba abajo: si se ve la silueta de una seta, es un huevo de amanita y puede ser mortal."],
+    scleroderma: ["Escleroderma", ["Bosques y bordes de caminos", "Verano y otoño", "4–10 cm"], "Provoca vómitos y mareos. Corteza dura, amarillenta y agrietada como piel de serpiente, y por dentro enseguida se vuelve negro violáceo."],
+    camagroc: ["Angula de monte", ["Pinares húmedos y musgo", "Final del otoño", "Sombrero de 2–5 cm"], "Sombrero marrón en forma de embudo y pie amarillo anaranjado, hueco por dentro. Por debajo es casi lisa, sin láminas. Sale en grupos numerosos."],
+    trompeta: ["Trompeta de los muertos", ["Hayedos y encinares", "Otoño", "2–8 cm de ancho"], "A pesar del nombre, es un comestible excelente. Tiene forma de trompeta negra, hueca hasta la base, y por debajo es lisa y gris."]
+  },
+  en: {
+    rovello: ["Bloody milk cap", ["Lowland pine woods", "Autumn", "Cap 5–12 cm"], "When cut it oozes wine-red milk. Funnel-shaped cap with concentric rings; it bruises green and the stem has small pits."],
+    torminosus: ["Woolly milkcap", ["Near birches", "Autumn", "Cap 4–10 cm"], "Causes strong stomach upsets. The cap margin is woolly and its milk is white, never wine-red or orange."],
+    cep: ["Porcini", ["Pine and beech woods", "Summer and autumn", "Cap 8–25 cm"], "An excellent edible. Whitish or yellowish pores, never red, and a thick stem with a fine pale net."],
+    mataparent: ["Satan's bolete", ["Holm oak and oak woods", "Summer and autumn", "Cap 10–30 cm"], "Causes violent vomiting. Whitish cap, red pores, a swollen reddish stem and flesh that turns blue when cut."],
+    tylopilus: ["Bitter bolete", ["Pine woods", "Summer and autumn", "Cap 6–15 cm"], "It isn't dangerous, but it's so bitter it ruins any dish. Pinkish pores and a dark net on the stem."],
+    oureig: ["Caesar's mushroom", ["Holm oak and chestnut woods", "Late summer", "Cap 8–20 cm"], "Highly prized. Orange cap, yellow gills and stem, and a white sac (volva) at the base. Never pick it while it's still a closed egg: inside it could be a death cap."],
+    reigbord: ["Fly agaric", ["Pine and birch woods", "Autumn", "Cap 8–20 cm"], "Red cap with white warts and white gills. Rain can wash the warts off and make it look like a Caesar's mushroom."],
+    farinera: ["Death cap", ["Holm oak and oak woods", "Autumn", "Cap 5–15 cm"], "Causes most mushroom deaths. Olive-green cap, white gills, a ring and a sac-like volva at the base. Symptoms appear hours later, once the liver is already damaged."],
+    llora: ["Green-cracking russula", ["Holm oak and oak woods", "Summer and autumn", "Cap 5–12 cm"], "Edible, but for experts only. Green cap with cracked skin, no ring and no volva. Mistaking it for a death cap can be fatal."],
+    rossinyol: ["Chanterelle", ["Holm oak and pine woods", "Summer and autumn", "Cap 3–10 cm"], "It has no true gills, just thick ridges running down the stem. Fruity smell, like apricots."],
+    omphalotus: ["Jack-o'-lantern mushroom", ["Olive and holm oak stumps", "Autumn", "In clusters"], "Causes vomiting and diarrhoea. Grows in clusters on wood, stumps or roots, and has true gills, thin and crowded."],
+    girgola: ["Oyster mushroom", ["Poplar and plane trunks", "Autumn and winter", "Fans 5–15 cm"], "Grows in overlapping fans on tree trunks. White gills running down to a very short stem, or none at all."],
+    apagallums: ["Parasol mushroom", ["Meadows and clearings", "Autumn", "Cap 15–30 cm"], "Can grow beyond 25 cm. It has a double ring that slides up and down and a snakeskin-patterned stem. Golden rule: no small lepiotas."],
+    brunneo: ["Deadly dapperling", ["Meadows, parks and gardens", "Autumn", "Cap 3–5 cm"], "It has the same toxin as the death cap. It looks like a miniature parasol, with pinkish scales. Never eat a lepiota smaller than 10 cm."],
+    fredolic: ["Grey knight", ["Pine woods", "Late autumn", "Cap 3–7 cm"], "Small, mouse-grey and velvety to the touch. Appears in groups in pine woods once it turns cold."],
+    pardinum: ["Tiger tricholoma", ["Mountain forests", "Autumn", "Cap 6–15 cm"], "Causes severe gastroenteritis. Bigger and sturdier than the grey knight, with dark grey scales on a pale background."],
+    orellanus: ["Fool's webcap", ["Holm oak and oak woods", "Autumn", "Cap 3–8 cm"], "Destroys the kidneys. Symptoms can take from two days to three weeks to appear, and by then the damage is done. Rust-coloured gills."],
+    camperol: ["Field mushroom", ["Grazed meadows", "Spring and autumn", "Cap 4–10 cm"], "Pink gills that turn chocolate brown. No volva, and it doesn't turn yellow when rubbed."],
+    xanthodermus: ["Yellow stainer", ["Parks, gardens and verges", "Autumn", "Cap 5–15 cm"], "Rub the base of the stem and it turns bright yellow; it smells of ink or iodine. Causes stomach upsets."],
+    verna: ["Fool's mushroom", ["Holm oak and oak woods", "Spring", "Cap 4–10 cm"], "All white, with a ring and a sac-like volva. It has the same toxins as the death cap. Never pick a white mushroom with a volva."],
+    pantherina: ["Panther cap", ["Holm oak and pine woods", "Summer and autumn", "Cap 5–12 cm"], "Can cause serious poisoning. Brown cap with white warts and a striated margin; a collar-like volva at the base."],
+    moixerno: ["St George's mushroom", ["Meadows and field edges", "Spring", "Cap 5–15 cm"], "Appears in spring, often in rings in meadows. Fleshy and creamy white, with crowded white gills and a strong smell of flour."],
+    entoloma: ["Livid pinkgill", ["Oak and beech woods", "Autumn", "Cap 8–20 cm"], "Causes very severe gastroenteritis that can last for days. It also smells of flour, like St George's mushroom, but it appears in autumn and its yellowish gills turn pink."],
+    camasec: ["Fairy ring champignon", ["Meadows", "Spring and autumn", "Cap 2–5 cm"], "Grows in rings in meadows. The stem is thin and elastic: you can twist it without it snapping. Widely spaced gills."],
+    dealbata: ["Ivory funnel", ["Meadows and lawns", "Summer and autumn", "Cap 2–4 cm"], "Contains muscarine: sweating, drooling and vomiting soon after eating it. Small and whitish, it grows in the same meadows as the fairy ring champignon."],
+    murgola: ["Morel", ["Riverside and burnt woods", "Spring", "5–15 cm tall"], "Edible only when well cooked: raw, it's toxic. The cap is pitted like a honeycomb and, if you cut it, it's completely hollow inside."],
+    gyromitra: ["False morel", ["Mountain pine woods", "Spring", "Cap 4–12 cm"], "Can be deadly, even cooked. The cap has no pits: it's wrinkled and folded like a brain, with irregular chambers inside."],
+    pinetell: ["Saffron milk cap", ["Mountain pine woods", "Autumn", "Cap 5–12 cm"], "A relative of the bloody milk cap, but paler, orange-ochre, with carrot-coloured milk rather than wine-red. It also bruises green."],
+    llenega: ["Hygrophorus latitabundus", ["Pine woods on limestone", "Late autumn and winter", "Cap 5–15 cm"], "Dark grey cap and a stem coated in a slimy layer, like snot. Appears with the cold and survives the first frosts."],
+    tinta: ["Shaggy ink cap", ["Meadows and path edges", "Autumn", "Cap 5–15 cm tall"], "Edible only when young, while the gills are still white. Within hours it dissolves into a black, ink-like liquid."],
+    atramentaria: ["Common ink cap", ["Gardens and path edges", "Spring and autumn", "Cap 3–7 cm"], "With alcohol it causes a strong reaction: flushing, palpitations and vomiting, even if you drink a few days after eating it."],
+    galerina: ["Funeral bell", ["Stumps and dead wood", "Autumn", "Cap 2–5 cm"], "It has the same toxins as the death cap. Small and brown, with a thin ring on the stem, it grows in clusters on stumps, like some edible stump mushrooms."],
+    hypholoma: ["Sulphur tuft", ["Stumps and roots", "Almost all year", "Cap 2–6 cm"], "Sulphur yellow, in tight clusters on stumps. Greenish gills and a very bitter taste. Causes stomach upsets."],
+    pimpinella: ["Wood blewit", ["Woodland leaf litter", "Autumn and winter", "Cap 5–15 cm"], "Lilac or violet tones, especially on the gills and stem, and a fruity smell. Edible only when well cooked."],
+    carlet: ["Pinkmottle woodwax", ["Holm oak and oak woods", "Autumn", "Cap 5–12 cm"], "Sturdy wine-red cap, white gills that become spotted with wine-red, and firm flesh. Grows in groups under holm oaks and oaks."],
+    emetica: ["The sickener", ["Damp pine woods and moss", "Summer and autumn", "Cap 4–9 cm"], "Causes vomiting. Bright red cap with fragile white gills and stem. Very hot, peppery taste: many red russulas aren't edible."],
+    nebularis: ["Clouded agaric", ["Woodland leaf litter", "Autumn", "Cap 8–20 cm"], "It used to be eaten, but it's now advised against: it upsets many people's stomachs. Ash-grey cap, cream gills and a strong smell."],
+    inocybe: ["Deadly fibrecap", ["Parks and broadleaf woods", "Spring", "Cap 3–8 cm"], "Can be very serious: it's loaded with muscarine. It appears in spring like St George's mushroom, but its cap is fibrous, pointed, and stains red."],
+    bolaneu: ["Horse mushroom", ["Meadows and clearings", "Autumn", "Cap 8–20 cm"], "White, large and with a broad ring. Smells of aniseed and slowly turns yellowish when rubbed. If it smells of ink or iodine, don't pick it."],
+    paxillus: ["Brown roll-rim", ["Damp woods", "Summer and autumn", "Cap 5–12 cm"], "It was eaten for years, until it was found it can trigger a fatal immune reaction, even when cooked. Inrolled margin and gills that stain brown when touched."],
+    petllop: ["Common puffball", ["Woods and meadows", "Summer and autumn", "3–6 cm"], "Edible only when young, if it's white and uniform inside. Always slice it top to bottom: if you see the outline of a mushroom, it's an Amanita egg and could be deadly."],
+    scleroderma: ["Common earthball", ["Woods and path edges", "Summer and autumn", "4–10 cm"], "Causes vomiting and dizziness. Hard, yellowish skin cracked like snakeskin, and the inside soon turns purplish black."],
+    camagroc: ["Yellow foot", ["Damp pine woods and moss", "Late autumn", "Cap 2–5 cm"], "Brown funnel-shaped cap and a yellow-orange stem, hollow inside. Almost smooth underneath, with no gills. Grows in large groups."],
+    trompeta: ["Black trumpet", ["Beech and holm oak woods", "Autumn", "2–8 cm wide"], "Despite its French name, “trumpet of death”, it's an excellent edible. Shaped like a black trumpet, hollow to the base, smooth and grey underneath."]
+  }
+};
+
+function pickLang() {
+  const h = (location.hash || "").slice(1);
+  if (["ca", "es", "en"].includes(h)) return h;
+  try { const s = localStorage.getItem("cistella-lang"); if (["ca", "es", "en"].includes(s)) return s; } catch (e) {}
+  const langs = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || "ca"]).map(l => l.toLowerCase());
+  if (langs.some(l => l.startsWith("ca"))) return "ca";
+  if (langs[0].startsWith("es") || langs[0].startsWith("gl") || langs[0].startsWith("eu")) return "es";
+  return "en";
+}
+let LANG = pickLang();
+function t(k, ...a) { const v = (I18N[LANG] && I18N[LANG][k] !== undefined) ? I18N[LANG][k] : I18N.ca[k]; return typeof v === "function" ? v(...a) : v; }
+const trOf = b => (LANG !== "ca" && TR[LANG] && TR[LANG][b.id]) || null;
+const nomOf = b => (trOf(b) || [b.nom])[0];
+const pistesOf = b => (trOf(b) || [0, b.pistes])[1];
+const textOf = b => (trOf(b) || [0, 0, b.text])[2];
+
 /* ------------------ Dades ------------------
    Cada bolet té un camp foto/credit preparat per a fotos reals amb llicència
    CC0, CC BY o CC BY-SA (les NC no permeten anuncis). */
 const CAT = {
-  comestible: { label: "Comestible", color: "var(--ok)" },
-  nocomestible: { label: "No comestible", color: "var(--no)" },
-  toxic: { label: "Tòxic", color: "var(--tox)" },
-  mortal: { label: "Mortal", color: "var(--mort)" }
+  comestible: { get label() { return t("cat_comestible"); }, color: "var(--ok)" },
+  nocomestible: { get label() { return t("cat_nocomestible"); }, color: "var(--no)" },
+  toxic: { get label() { return t("cat_toxic"); }, color: "var(--tox)" },
+  mortal: { get label() { return t("cat_mortal"); }, color: "var(--mort)" }
 };
 
 const BOLETS = [
@@ -876,7 +1165,7 @@ function scene(b, uid) {
     }
   }
   o += front;
-  return `<svg class="scene" viewBox="0 -50 400 430" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Il·lustració d'un bolet">${o}</svg>`;
+  return `<svg class="scene" viewBox="0 -50 400 430" preserveAspectRatio="xMidYMid slice" role="img" aria-label="${t("illusAlt")}">${o}</svg>`;
 }
 
 /* ------------------ Fons del bosc ------------------ */
@@ -932,14 +1221,14 @@ function judge(b, choice) {
   // retorna {ok, life, verdict, over}
   const edible = b.cat === "comestible";
   if (choice === "cistella") {
-    if (edible) return { ok: true, life: 0, verdict: "A la cistella!" };
-    if (b.cat === "nocomestible") return { ok: false, life: 0, verdict: "Sopar amarg" };
-    if (b.cat === "toxic") return { ok: false, life: -1, verdict: "Mal de panxa" };
-    return { ok: false, life: -99, verdict: "Cistella enverinada", over: true };
+    if (edible) return { ok: true, life: 0, verdict: t("vYes") };
+    if (b.cat === "nocomestible") return { ok: false, life: 0, verdict: t("vBitter") };
+    if (b.cat === "toxic") return { ok: false, life: -1, verdict: t("vTox") };
+    return { ok: false, life: -99, verdict: t("vDead"), over: true };
   }
-  if (edible) return { ok: false, life: 0, verdict: "S'ha quedat al bosc" };
-  if (b.cat === "mortal") return { ok: true, life: 0, verdict: "Ben fet, t'has salvat" };
-  return { ok: true, life: 0, verdict: b.cat === "toxic" ? "Bona decisió" : "Ben vist" };
+  if (edible) return { ok: false, life: 0, verdict: t("vLeftGood") };
+  if (b.cat === "mortal") return { ok: true, life: 0, verdict: t("vSaved") };
+  return { ok: true, life: 0, verdict: b.cat === "toxic" ? t("vGood") : t("vSeen") };
 }
 
 function start() {
@@ -959,12 +1248,12 @@ function renderHud() {
 }
 
 function cardHTML(b, n) {
-  return `<div class="stamp yes">CISTELLA</div><div class="stamp no">AL BOSC</div>
-    ${b.foto ? `<img class="scene" src="${b.foto}" alt="Foto d'un bolet" draggable="false">` : scene(b, n)}
+  return `<div class="stamp yes">${t("stampYes")}</div><div class="stamp no">${t("stampNo")}</div>
+    ${b.foto ? `<img class="scene" src="${b.foto}" alt="${t("photoAlt")}" draggable="false">` : scene(b, n)}
     <div class="info">
-      <div class="hint">${b.pistes.map(p => `<span class="chip">${p}</span>`).join("")}</div>
-      ${b.foto ? `<div class="credit">Foto: ${b.credit}</div>` : ""}
-      ${st.n === 0 ? `<div class="tuto">Arrossega la targeta o fes servir els botons.</div>` : ""}
+      <div class="hint">${pistesOf(b).map(p => `<span class="chip">${p}</span>`).join("")}</div>
+      ${b.foto ? `<div class="credit">${t("photo")} ${creditOf(b)}</div>` : ""}
+      ${st.n === 0 ? `<div class="tuto">${t("tuto")}</div>` : ""}
     </div>`;
 }
 
@@ -1044,13 +1333,13 @@ function showFlash(b, res, gained) {
   const fl = $("flash");
   fl.innerHTML = `
     <div class="v" style="color:${res.ok ? "#9fd36a" : "#f0b45a"}">${res.ok ? `+${gained}` : res.verdict}</div>
-    ${res.ok && st.fast >= 6 ? `<div class="tap">Ràpid! +${st.fast} de bonificació${st.streak >= 3 ? ` · ratxa x${1 + Math.floor((st.streak - 1) / 3)}` : ""}</div>` : res.ok && st.streak >= 3 ? `<div class="tap">Ratxa x${1 + Math.floor((st.streak - 1) / 3)}</div>` : ""}
-    <div class="n"><b>${b.nom}</b>${b.nom !== b.sci ? `<i>${b.sci}</i>` : ""}<span class="badge" style="background:${c.color}">${c.label}</span><p>${b.text}</p></div>
+    ${res.ok && st.fast >= 6 ? `<div class="tap">${t("fast", st.fast)}${st.streak >= 3 ? ` · ${t("streakX", 1 + Math.floor((st.streak - 1) / 3))}` : ""}</div>` : res.ok && st.streak >= 3 ? `<div class="tap">${t("streakX", 1 + Math.floor((st.streak - 1) / 3))}</div>` : ""}
+    <div class="n"><b>${nomOf(b)}</b>${nomOf(b) !== b.sci ? `<i>${b.sci}</i>` : ""}<span class="badge" style="background:${c.color}">${c.label}</span><p>${textOf(b)}</p></div>
     <div class="timer"><i></i></div>
-    <div class="tap">Toca per continuar</div>
-    ${b.conf.length ? `<button class="why" id="btnWhy">Amb què es confon?</button>` : ""}`;
+    <div class="tap">${t("tap")}</div>
+    ${b.conf.length ? `<button class="why" id="btnWhy">${t("why")}</button>` : ""}`;
   // temps segons la llargada del text: entre 3,5 i 8 segons
-  const dur = Math.min(8000, Math.max(3500, 1500 + b.text.length * 30));
+  const dur = Math.min(8000, Math.max(3500, 1500 + textOf(b).length * 30));
   fl.style.setProperty("--dur", dur + "ms");
   void fl.offsetWidth;
   fl.classList.add("show");
@@ -1062,21 +1351,21 @@ function showFlash(b, res, gained) {
 
 function showSheet(b, res, gained) {
   const c = CAT[b.cat];
-  const sub = !res.ok && b.cat === "comestible" ? "Prudent, però t'has perdut un bon sopar."
-    : res.life === -1 ? "Perds una cistella."
-    : res.over ? "Un sol error així pot ser mortal. Fi de la jornada."
-    : !res.ok && b.cat === "nocomestible" ? "No et farà mal, però amarga com el fel." : "";
+  const sub = !res.ok && b.cat === "comestible" ? t("subLeft")
+    : res.life === -1 ? t("subLife")
+    : res.over ? t("subDead")
+    : !res.ok && b.cat === "nocomestible" ? t("subBitter") : "";
   const conf = b.conf.map(k => BY_ID[k]).filter(Boolean);
   const stripe = res.ok ? "var(--ok)" : c.color;
   $("sheet").innerHTML = `
     <div class="stripe" style="background:${stripe}"></div>
     <div class="verdict" style="color:${res.ok ? "var(--ok)" : c.color}">${res.verdict}</div>
-    <div class="pts">${res.ok ? `+${gained} punts${st.streak >= 3 ? ` · ratxa de ${st.streak}` : ""}` : sub}</div>
-    <div class="name"><b>${b.nom}</b>${b.nom !== b.sci ? `<i>${b.sci}</i>` : ""}<span class="badge" style="background:${c.color}">${c.label}</span></div>
-    <p>${b.text}</p>
-    ${conf.length ? `<div class="confusio">Es confon amb: ${conf.map(x => (x.cat === "mortal" || x.cat === "toxic") ? `<b>${x.nom}</b> (${CAT[x.cat].label.toLowerCase()})` : `${x.nom} (${CAT[x.cat].label.toLowerCase()})`).join(", ")}</div>` : ""}
-    ${b.foto ? `<div class="src">Foto: ${b.credit} · <a href="${b.url}" target="_blank" rel="noopener">${b.font || "iNaturalist"}</a></div>` : ""}
-    <button class="next" id="btnNext">${st.dead || st.i + 1 >= st.deck.length ? "Veure el resultat" : "Següent bolet"}</button>`;
+    <div class="pts">${res.ok ? `${t("plusPts", gained)}${st.streak >= 3 ? ` · ${t("streakOf", st.streak)}` : ""}` : sub}</div>
+    <div class="name"><b>${nomOf(b)}</b>${nomOf(b) !== b.sci ? `<i>${b.sci}</i>` : ""}<span class="badge" style="background:${c.color}">${c.label}</span></div>
+    <p>${textOf(b)}</p>
+    ${conf.length ? `<div class="confusio">${t("confWith")} ${conf.map(x => (x.cat === "mortal" || x.cat === "toxic") ? `<b>${nomOf(x)}</b> (${CAT[x.cat].label.toLowerCase()})` : `${nomOf(x)} (${CAT[x.cat].label.toLowerCase()})`).join(", ")}</div>` : ""}
+    ${b.foto ? `<div class="src">${t("photo")} ${creditOf(b)} · <a href="${b.url}" target="_blank" rel="noopener">${b.font || "iNaturalist"}</a></div>` : ""}
+    <button class="next" id="btnNext">${st.dead || st.i + 1 >= st.deck.length ? t("seeResult") : t("next")}</button>`;
   $("sheet").classList.add("open");
   $("btnNext").focus({ preventScroll: true });
   $("btnNext").onclick = next;
@@ -1095,17 +1384,17 @@ function end() {
   try { best = Math.max(best, +localStorage.getItem("cistella-best-v2") || 0); localStorage.setItem("cistella-best-v2", best); } catch (e) {}
   const killed = st.deck[st.i - 1] && st.deck[st.i - 1].cat === "mortal" && st.lastMortal;
   const complet = !st.dead;
-  $("endTitle").textContent = killed ? "Intoxicació!" : !complet ? "Sense cistelles" : st.hits === st.n ? "Jornada perfecta!" : "Has recorregut tot el bosc";
+  $("endTitle").textContent = killed ? t("tPoison") : !complet ? t("tNoBaskets") : st.hits === st.n ? t("tPerfect") : t("tDone");
   $("endText").textContent = killed
-    ? "Has posat a la cistella un bolet mortal. Al bosc, quan dubtis, deixa'l on és."
+    ? t("ePoison")
     : complet
-      ? `Has vist els ${st.n} bolets i n'has encertat ${st.hits}, amb una ratxa màxima de ${st.best}.${st.hits === st.n ? " Ara, a fer-ho més ràpid!" : ""}`
-      : `Has fet ${st.hits} encerts de ${st.n} bolets, amb una ratxa màxima de ${st.best}.`;
+      ? t("eDone", st.n, st.hits, st.best, st.hits === st.n)
+      : t("ePartial", st.n, st.hits, st.best);
   $("stScore").textContent = st.score;
   $("stHits").textContent = `${st.hits}/${st.n}`;
   $("stBest").textContent = best;
   $("mortalWrap").hidden = !st.seenMortal.length;
-  $("mortalList").innerHTML = st.seenMortal.map(k => `<span class="chip">${BY_ID[k].nom}</span>`).join("");
+  $("mortalList").innerHTML = st.seenMortal.map(k => `<span class="chip">${nomOf(BY_ID[k])}</span>`).join("");
   $("btnWa").href = "https://wa.me/?text=" + encodeURIComponent(shareText());
   $("shMsg").textContent = "";
   $("btnSave").disabled = false;
@@ -1145,7 +1434,7 @@ if ("serviceWorker" in navigator && location.protocol === "https:" && location.h
 /* Fotos reals: si hi ha un fotos.json al costat (generat amb tria_fotos.py), substitueixen les il·lustracions */
 function nomAutor(v) {
   const c = v.credit || "";
-  if (/no rights reserved/i.test(c) || /^(cc0|public domain)/i.test(v.llicencia || "")) return "Domini públic";
+  if (/no rights reserved/i.test(c) || /^(cc0|public domain)/i.test(v.llicencia || "")) return null; // domini públic
   let m = c.match(/^\(c\)\s*(.+?),\s*(some|all) rights reserved/i);
   if (m) return m[1];
   m = c.match(/^(.+?)\s*\((CC|Public)/);
@@ -1153,17 +1442,17 @@ function nomAutor(v) {
 }
 function llicencia(v) {
   const l = (v.llicencia || "").toUpperCase().replace(/-/g, " ").trim();
-  if (l.startsWith("CC0")) return { nom: "CC0", url: "https://creativecommons.org/publicdomain/zero/1.0/deed.ca" };
-  if (l.includes("PUBLIC")) return { nom: "Domini públic", url: "" };
+  if (l.startsWith("CC0")) return { nom: "CC0", url: "https://creativecommons.org/publicdomain/zero/1.0/deed." };
+  if (l.includes("PUBLIC")) return { nom: "PD", url: "" };
   const ver = (l.match(/(\d\.\d)/) || [, "4.0"])[1];
   const sa = l.includes("SA");
-  return { nom: `CC BY${sa ? "-SA" : ""} ${ver}`, url: `https://creativecommons.org/licenses/by${sa ? "-sa" : ""}/${ver}/deed.ca` };
+  return { nom: `CC BY${sa ? "-SA" : ""} ${ver}`, url: `https://creativecommons.org/licenses/by${sa ? "-sa" : ""}/${ver}/deed.` };
 }
 fetch("fotos.json").then(r => r.ok ? r.json() : {}).then(j => {
   for (const [id, v] of Object.entries(j)) if (BY_ID[id]) {
     const lic = llicencia(v), autor = nomAutor(v);
     Object.assign(BY_ID[id], { foto: v.foto, url: v.url, font: v.font || "iNaturalist", lic,
-      autor, credit: autor === "Domini públic" ? "domini públic (CC0)" : `${autor} · ${lic.nom}` });
+      autor });
   }
 }).catch(() => {});
 
@@ -1208,7 +1497,7 @@ async function showPodi() {
   r = (r || []).slice(0, 3);
   L.innerHTML = r.length
     ? r.map((e, i) => `<li><span class="m" style="background:${colors[i]}">${i + 1}</span><span>${esc(e.nom)}</span><b>${e.punts}</b></li>`).join("")
-    : `<li class="buit" style="display:block">${local && FIREBASE_CONFIG ? "No s'ha pogut carregar el rànquing." : "Encara no hi ha ningú. Sigues el primer!"}</li>`;
+    : `<li class="buit" style="display:block">${local && FIREBASE_CONFIG ? t("rankLoadFail") : t("rankEmpty")}</li>`;
 }
 
 function localRank() { try { return JSON.parse(localStorage.getItem("cistella-rank-v2") || "[]"); } catch (e) { return []; } }
@@ -1232,16 +1521,16 @@ async function showRank(tab) {
   const row = (e, me) => `<li class="${me ? "me" : ""}"><span>${esc(e.nom)}</span><b>${e.punts}</b></li>`;
   if (rankTab === "local") {
     const r = localRank();
-    L.innerHTML = r.length ? r.map(e => row(e, lastSaved && e.t === lastSaved.t)).join("") : `<li class="empty">Encara no hi ha cap partida desada en aquest mòbil.</li>`;
-    if (!db) L.innerHTML += `<li class="empty">El rànquing de tothom s'activa quan el joc està connectat a Firebase.</li>`;
+    L.innerHTML = r.length ? r.map(e => row(e, lastSaved && e.t === lastSaved.t)).join("") : `<li class="empty">${t("localEmpty")}</li>`;
+    if (!db) L.innerHTML += `<li class="empty">${t("noFirebase")}</li>`;
     return;
   }
-  L.innerHTML = `<li class="empty">Carregant…</li>`;
+  L.innerHTML = `<li class="empty">${t("loading")}</li>`;
   try {
     const r = await globalRank();
-    L.innerHTML = r.length ? r.map(e => row(e, lastSaved && e.id === lastSaved.id)).join("") : `<li class="empty">Encara no hi ha ningú. Sigues el primer!</li>`;
+    L.innerHTML = r.length ? r.map(e => row(e, lastSaved && e.id === lastSaved.id)).join("") : `<li class="empty">${t("rankEmpty")}</li>`;
   } catch (e) {
-    L.innerHTML = `<li class="empty">No s'ha pogut carregar el rànquing. Comprova la connexió.</li>`;
+    L.innerHTML = `<li class="empty">${t("rankFailConn")}</li>`;
   }
 }
 function esc(t) { return String(t).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
@@ -1249,8 +1538,8 @@ function esc(t) { return String(t).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<"
 $("saveForm").addEventListener("submit", async e => {
   e.preventDefault();
   const nom = $("nom").value.trim().replace(/\s+/g, " ").slice(0, 16);
-  if (!nom) { $("savedMsg").textContent = "Escriu un nom per apuntar-te."; $("nom").focus(); return; }
-  if (!st || st.score <= 0) { $("savedMsg").textContent = "Amb 0 punts no s'apunta al rànquing."; return; }
+  if (!nom) { $("savedMsg").textContent = t("needName"); $("nom").focus(); return; }
+  if (!st || st.score <= 0) { $("savedMsg").textContent = t("zero"); return; }
   try { localStorage.setItem("cistella-nom", nom); } catch (e) {}
   $("btnSave").disabled = true;
   const entry = { nom, punts: st.score, encerts: st.hits, t: Date.now() };
@@ -1260,9 +1549,9 @@ $("saveForm").addEventListener("submit", async e => {
     try {
       const ref = await db.collection("ranking").add({ nom, punts: st.score, encerts: st.hits, data: firebase.firestore.FieldValue.serverTimestamp() });
       lastSaved.id = ref.id;
-      $("savedMsg").textContent = "Desat al rànquing!";
-    } catch (err) { $("savedMsg").textContent = "Desat en aquest mòbil. El rànquing de tothom no respon ara."; }
-  } else $("savedMsg").textContent = "Desat al rànquing d'aquest mòbil.";
+      $("savedMsg").textContent = t("saved");
+    } catch (err) { $("savedMsg").textContent = t("savedLocalFail"); }
+  } else $("savedMsg").textContent = t("savedLocal");
   showRank(db ? "global" : "local");
 });
 /* Contacte: els missatges es guarden a la col·lecció "missatges" de Firestore */
@@ -1273,10 +1562,8 @@ $("saveForm").addEventListener("submit", async e => {
 const SITE = "https://cistella-joc.github.io/";
 function shareText() {
   const killed = st.dead && st.lastMortal, perfect = !st.dead && st.hits === st.n;
-  const cap = perfect ? `Jornada perfecta a Cistella!: ${st.n}/${st.n} bolets i ${st.score} punts 🧺`
-    : killed ? `He acabat intoxicat a Cistella! amb ${st.score} punts 😵`
-    : `He fet ${st.score} punts a Cistella! (${st.hits}/${st.n} bolets) 🧺`;
-  return `${cap}\nSaps distingir un rovelló d'una farinera borda? 🍄\n${SITE}`;
+  const cap = perfect ? t("shPerfect", st.n, st.score) : killed ? t("shKilled", st.score) : t("shNormal", st.score, st.hits, st.n);
+  return `${cap}\n${t("shLine2")}\n${SITE}${LANG === "ca" ? "" : "#" + LANG}`;
 }
 $("btnWa").addEventListener("click", () => compta("compartits"));
 $("btnShare").onclick = async () => {
@@ -1285,8 +1572,8 @@ $("btnShare").onclick = async () => {
   try {
     if (navigator.share) { await navigator.share({ text }); return; }
   } catch (e) { if (e && e.name === "AbortError") return; }
-  try { await navigator.clipboard.writeText(text); $("shMsg").textContent = "Copiat! Enganxa-ho on vulguis."; }
-  catch (e) { $("shMsg").textContent = "No s'ha pogut compartir des d'aquí. Prova el botó de WhatsApp."; }
+  try { await navigator.clipboard.writeText(text); $("shMsg").textContent = t("copied"); }
+  catch (e) { $("shMsg").textContent = t("shareFail"); }
 };
 function showAbout() { $("about").hidden = false; $("about").scrollTop = 0; $("cMsg").textContent = ""; }
 $("btnAbout1").onclick = showAbout;
@@ -1296,17 +1583,17 @@ $("cform").addEventListener("submit", async e => {
   e.preventDefault();
   const msg = $("cMsg"), text = $("cText").value.trim(), mail = $("cMail").value.trim();
   if ($("cWeb").value) return; // trampa per a robots
-  if (text.length < 5) { msg.style.color = "var(--mort)"; msg.textContent = "Escriu el missatge abans d'enviar-lo."; $("cText").focus(); return; }
-  if (mail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) { msg.style.color = "var(--mort)"; msg.textContent = "Revisa l'adreça de correu: sembla que no és correcta."; $("cMail").focus(); return; }
-  $("cSend").disabled = true; msg.style.color = "var(--escorca)"; msg.textContent = "Enviant…";
+  if (text.length < 5) { msg.style.color = "var(--mort)"; msg.textContent = t("cEmpty"); $("cText").focus(); return; }
+  if (mail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) { msg.style.color = "var(--mort)"; msg.textContent = t("cBadMail"); $("cMail").focus(); return; }
+  $("cSend").disabled = true; msg.style.color = "var(--escorca)"; msg.textContent = t("cSending");
   await dbReady;
   try {
     if (!db) throw new Error("sense connexió");
     await db.collection("missatges").add({ nom: $("cNom").value.trim().slice(0, 60), correu: mail.slice(0, 120), text: text.slice(0, 1500), data: firebase.firestore.FieldValue.serverTimestamp() });
-    msg.style.color = "var(--ok)"; msg.textContent = "Missatge enviat. Gràcies!";
+    msg.style.color = "var(--ok)"; msg.textContent = t("cSent");
     $("cText").value = "";
   } catch (err) {
-    msg.style.color = "var(--mort)"; msg.textContent = "No s'ha pogut enviar. Comprova la connexió i torna-ho a provar.";
+    msg.style.color = "var(--mort)"; msg.textContent = t("cFail");
   }
   $("cSend").disabled = false;
 });
@@ -1318,14 +1605,34 @@ $("btnRank2").onclick = () => showRank();
 $("btnRankClose").onclick = () => { $("rank").hidden = true; };
 document.querySelectorAll("#rankTabs button").forEach(b => b.onclick = () => showRank(b.dataset.t));
 
+function creditOf(b) { return b.autor ? `${esc(b.autor)} · ${b.lic.nom}` : t("creditCC0"); }
+
+/* Canvi d'idioma */
+function applyLang() {
+  document.documentElement.lang = LANG;
+  document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll("[data-i18n-ph]").forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
+  document.querySelectorAll("[data-i18n-aria]").forEach(el => { el.setAttribute("aria-label", t(el.dataset.i18nAria)); });
+  document.querySelectorAll("#langs button").forEach(b => b.setAttribute("aria-pressed", b.dataset.l === LANG));
+  $("langs").setAttribute("aria-label", t("langLabel"));
+}
+function setLang(l) {
+  LANG = l;
+  try { localStorage.setItem("cistella-lang", l); } catch (e) {}
+  applyLang();
+  showPodi();
+}
+document.querySelectorAll("#langs button").forEach(b => b.onclick = () => setLang(b.dataset.l));
+applyLang();
+
 function showCredits() {
   const fotos = BOLETS.filter(b => b.foto);
   $("clist").innerHTML = fotos.length
-    ? fotos.map(b => `<li><b>${b.nom}</b> <span class="who">· ${b.autor}</span><br>
-        ${b.lic.url ? `<a href="${b.lic.url}" target="_blank" rel="noopener">${b.lic.nom}</a>` : b.lic.nom}
-        · <a href="${b.url}" target="_blank" rel="noopener">foto original a ${b.font}</a></li>`).join("")
-      + (fotos.length < BOLETS.length ? `<li>Els bolets sense foto es mostren amb il·lustracions pròpies del joc.</li>` : "")
-    : `<li>Totes les imatges d'aquesta versió són il·lustracions pròpies del joc.</li>`;
+    ? fotos.map(b => `<li><b>${nomOf(b)}</b> <span class="who">· ${esc(b.autor || t("publicDomain"))}</span><br>
+        ${b.lic.url ? `<a href="${b.lic.url}${LANG}" target="_blank" rel="noopener">${b.lic.nom}</a>` : t("publicDomain")}
+        · <a href="${b.url}" target="_blank" rel="noopener">${t("originalAt")} ${b.font}</a></li>`).join("")
+      + (fotos.length < BOLETS.length ? `<li>${t("illusNote")}</li>` : "")
+    : `<li>${t("allIllus")}</li>`;
   $("credits").hidden = false;
   $("credits").scrollTop = 0;
 }

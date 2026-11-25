@@ -151,7 +151,7 @@ button:focus-visible { outline: 3px solid var(--rovello); outline-offset: 3px; }
 .screen {
   position: absolute; inset: 0; z-index: 10;
   background: radial-gradient(ellipse at 50% 30%, #2f4224, #151d12 75%);
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start; justify-content: safe center;
   gap: 14px; padding: 20px 20px 24px; text-align: center;
   overflow-y: auto;
 }
@@ -181,6 +181,14 @@ button:focus-visible { outline: 3px solid var(--rovello); outline-offset: 3px; }
   font-size: 12.5px; font-weight: 700; gap: 2px;
 }
 .ad small { font-weight: 600; opacity: .8; }
+.podi { width: min(100%, 360px); background: rgba(247,236,214,.08); border: 1px solid rgba(247,236,214,.16); border-radius: 16px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; text-align: left; }
+.podi h3 { margin: 0; font-family: var(--display); font-weight: 800; font-size: 17px; display: flex; justify-content: space-between; align-items: baseline; }
+.podi h3 button { font-family: var(--body); }
+.podi ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.podi li { display: grid; grid-template-columns: 26px 1fr auto; gap: 8px; align-items: center; font-size: 15px; font-weight: 700; }
+.podi li .m { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 800; color: #2a1608; }
+.podi li b { font-family: var(--display); font-variant-numeric: tabular-nums; }
+.podi .buit { font-size: 13.5px; color: #c9d2b4; font-weight: 600; }
 .linkbtn { background: none; border: 0; color: #c9d2b4; font-weight: 700; font-size: 13.5px; text-decoration: underline; text-underline-offset: 3px; padding: 6px; }
 #credits, #rank { justify-content: flex-start; text-align: left; }
 #rank h2 { font-family: var(--display); font-weight: 800; font-size: 30px; margin: 8px 0 0; }
@@ -252,6 +260,10 @@ button:focus-visible { outline: 3px solid var(--rovello); outline-offset: 3px; }
       <div class="rule"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="11" r="8" fill="#a3201a"/><circle cx="9" cy="10" r="2" fill="#f7ecd6"/><circle cx="15" cy="10" r="2" fill="#f7ecd6"/><rect x="9" y="17" width="6" height="4" rx="1" fill="#a3201a"/></svg>Un de mortal acaba la partida de cop.</div>
     </div>
     <button class="big" id="btnStart">Anem a buscar bolets</button>
+    <div class="podi" id="podi">
+      <h3>Els millors boletaires <button class="linkbtn" id="btnRank3">Veure'l tot</button></h3>
+      <ol id="podiList"><li class="buit" style="display:block">Carregant…</li></ol>
+    </div>
     <p class="disc">És un joc, no una guia. Mai no mengis un bolet identificat amb una pantalla: porta'l a una associació micològica o a un expert.</p>
     <div style="display:flex;gap:14px"><button class="linkbtn" id="btnRank1">Rànquing</button><button class="linkbtn" id="btnCred1">Crèdits de les fotos</button></div>
   </section>
@@ -1019,7 +1031,7 @@ function next() {
 
 function end() {
   let best = st.score;
-  try { best = Math.max(best, +localStorage.getItem("cistella-best") || 0); localStorage.setItem("cistella-best", best); } catch (e) {}
+  try { best = Math.max(best, +localStorage.getItem("cistella-best-v2") || 0); localStorage.setItem("cistella-best-v2", best); } catch (e) {}
   const killed = st.deck[st.i - 1] && st.deck[st.i - 1].cat === "mortal" && st.lastMortal;
   const complet = !st.dead;
   $("endTitle").textContent = killed ? "Intoxicació!" : !complet ? "Sense cistelles" : st.hits === st.n ? "Jornada perfecta!" : "Has recorregut tot el bosc";
@@ -1101,18 +1113,31 @@ const FIREBASE_CONFIG = {
 let db = null, rankTab = "global", lastSaved = null;
 
 function loadScript(src) { return new Promise((ok, ko) => { const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = ko; document.head.appendChild(s); }); }
-if (FIREBASE_CONFIG) {
-  const v = "10.12.2";
-  loadScript(`https://www.gstatic.com/firebasejs/${v}/firebase-app-compat.js`)
-    .then(() => loadScript(`https://www.gstatic.com/firebasejs/${v}/firebase-firestore-compat.js`))
-    .then(() => { firebase.initializeApp(FIREBASE_CONFIG); db = firebase.firestore(); })
-    .catch(() => { db = null; });
+const dbReady = FIREBASE_CONFIG
+  ? loadScript(`https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js`)
+      .then(() => loadScript(`https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js`))
+      .then(() => { firebase.initializeApp(FIREBASE_CONFIG); db = firebase.firestore(); })
+      .catch(() => { db = null; })
+  : Promise.resolve();
+
+/* Podi de la pantalla d'inici */
+async function showPodi() {
+  await dbReady;
+  const L = $("podiList"), colors = ["#e8c14a", "#cfd3d6", "#d08a4e"];
+  let r = null;
+  try { r = db ? await globalRank() : null; } catch (e) { r = null; }
+  const local = !r;
+  if (local) r = localRank();
+  r = (r || []).slice(0, 3);
+  L.innerHTML = r.length
+    ? r.map((e, i) => `<li><span class="m" style="background:${colors[i]}">${i + 1}</span><span>${esc(e.nom)}</span><b>${e.punts}</b></li>`).join("")
+    : `<li class="buit" style="display:block">${local && FIREBASE_CONFIG ? "No s'ha pogut carregar el rànquing." : "Encara no hi ha ningú. Sigues el primer!"}</li>`;
 }
 
-function localRank() { try { return JSON.parse(localStorage.getItem("cistella-rank") || "[]"); } catch (e) { return []; } }
+function localRank() { try { return JSON.parse(localStorage.getItem("cistella-rank-v2") || "[]"); } catch (e) { return []; } }
 function saveLocal(entry) {
   const r = localRank().concat(entry).sort((a, b) => b.punts - a.punts).slice(0, 20);
-  try { localStorage.setItem("cistella-rank", JSON.stringify(r)); } catch (e) {}
+  try { localStorage.setItem("cistella-rank-v2", JSON.stringify(r)); } catch (e) {}
 }
 async function globalRank() {
   if (!db) return null;
@@ -1121,6 +1146,7 @@ async function globalRank() {
 }
 
 async function showRank(tab) {
+  await dbReady;
   rankTab = tab || rankTab;
   if (!db && rankTab === "global") rankTab = "local";
   document.querySelectorAll("#rankTabs button").forEach(b => b.setAttribute("aria-pressed", b.dataset.t === rankTab));
@@ -1163,6 +1189,8 @@ $("saveForm").addEventListener("submit", async e => {
   showRank(db ? "global" : "local");
 });
 $("btnRank1").onclick = () => showRank();
+$("btnRank3").onclick = () => showRank("global");
+showPodi();
 $("btnRank2").onclick = () => showRank();
 $("btnRankClose").onclick = () => { $("rank").hidden = true; };
 document.querySelectorAll("#rankTabs button").forEach(b => b.onclick = () => showRank(b.dataset.t));

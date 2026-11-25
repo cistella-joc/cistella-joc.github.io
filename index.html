@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cistella!</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gluten:wght@500;700;800&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Bosc al capvespre: fons de molsa fosca, targetes de paper cru, accent rovelló */
+  --bosc: #1d2719;
+  --molsa: #36502a;
+  --crema: #f7ecd6;
+  --crema-2: #efdcb8;
+  --rovello: #e07a2e;
+  --escorca: #3f2a1d;
+  --display: "Gluten", "Comic Sans MS", system-ui, sans-serif;
+  --body: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ok: #4f7d2f;
+  --no: #8a7a55;
+  --tox: #d16a1e;
+  --mort: #a3201a;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  background: var(--bosc);
+  color: var(--crema);
+  font-family: var(--body);
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+#bg { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; }
+#app {
+  position: relative; z-index: 1;
+  height: 100%; max-width: 460px; margin: 0 auto;
+  display: flex; flex-direction: column;
+  padding: 12px 16px 16px;
+  gap: 10px;
+}
+button { font-family: inherit; cursor: pointer; }
+button:focus-visible { outline: 3px solid var(--rovello); outline-offset: 3px; }
+
+/* Capçalera */
+.hud { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.brand { font-family: var(--display); font-weight: 800; font-size: 26px; color: var(--crema); letter-spacing: .5px; }
+.brand span { color: var(--rovello); }
+.lives { display: flex; gap: 4px; }
+.lives svg { width: 26px; height: 23px; color: var(--crema-2); transition: opacity .3s, transform .3s; }
+.lives svg.lost { opacity: .18; transform: scale(.85); }
+.score { font-family: var(--display); font-weight: 700; font-size: 20px; font-variant-numeric: tabular-nums; text-align: right; line-height: 1; }
+.score small { display: block; font-family: var(--body); font-size: 11px; font-weight: 700; color: #b9c4a4; margin-top: 3px; letter-spacing: .3px; }
+.progress { height: 6px; border-radius: 6px; background: rgba(247,236,214,.12); overflow: hidden; }
+.progress i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #c9a24a, var(--rovello)); border-radius: 6px; transition: width .4s; }
+
+/* Escenari i targetes */
+.stage { position: relative; flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; }
+.card {
+  position: absolute;
+  width: min(100%, 400px);
+  max-height: 100%;
+  background: var(--crema);
+  color: var(--escorca);
+  border-radius: 28px;
+  box-shadow: 0 18px 40px rgba(0,0,0,.45), 0 2px 0 rgba(255,255,255,.4) inset;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  will-change: transform;
+  display: flex; flex-direction: column;
+}
+.card.back { transform: translateY(14px) scale(.95); filter: brightness(.82); }
+.card.anim { transition: transform .35s cubic-bezier(.2,.8,.3,1), opacity .35s; }
+.card { height: min(100%, 560px); border: 6px solid var(--crema); }
+.card .scene { display: block; width: 100%; height: 100%; border-radius: 22px; object-fit: cover; pointer-events: none; }
+.credit { font-size: 10.5px; font-weight: 600; color: rgba(247,236,214,.85); text-shadow: 0 1px 2px rgba(0,0,0,.7); }
+.sheet .src { font-size: 12px; color: #7a6250; }
+.sheet .src a { color: inherit; }
+.card .info { position: absolute; left: 0; right: 0; bottom: 0; padding: 40px 14px 14px; display: flex; flex-direction: column; gap: 6px; background: linear-gradient(transparent, rgba(40,26,14,.55)); border-radius: 0 0 22px 22px; }
+.card .hint { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { box-shadow: 0 2px 6px rgba(0,0,0,.2); font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 99px; background: var(--crema-2); color: var(--escorca); }
+.stamp {
+  position: absolute; top: 22px; padding: 4px 12px 2px;
+  font-family: var(--display); font-weight: 800; font-size: 26px;
+  border: 4px solid; border-radius: 12px; opacity: 0; pointer-events: none;
+  background: rgba(247,236,214,.85);
+}
+.stamp.yes { left: 18px; color: var(--ok); transform: rotate(-12deg); }
+.stamp.no { right: 18px; color: #7a5a2a; transform: rotate(12deg); }
+.tuto { font-size: 12.5px; font-weight: 800; color: var(--crema); text-shadow: 0 1px 3px rgba(0,0,0,.6); }
+
+/* Botons d'acció */
+.controls { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.act {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 14px 10px; border-radius: 18px; border: 0;
+  font-weight: 800; font-size: 16px;
+  box-shadow: 0 4px 0 rgba(0,0,0,.35);
+  transition: transform .1s, box-shadow .1s;
+}
+.act:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,.35); }
+.act svg { width: 24px; height: 24px; }
+.act.no { background: #4a3a26; color: var(--crema); }
+.act.yes { background: var(--rovello); color: #2a1608; }
+.act:disabled { opacity: .5; }
+
+/* Flaix de resposta */
+.flash { position: absolute; inset: 0; z-index: 4; background: rgba(18,26,14,.72); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; pointer-events: none; opacity: 0; transform: scale(.9); transition: opacity .18s, transform .25s cubic-bezier(.2,1.4,.4,1); }
+.flash.show { opacity: 1; transform: scale(1); pointer-events: auto; }
+.flash .v { font-family: var(--display); font-weight: 800; font-size: clamp(38px, 12vw, 54px); line-height: 1; text-shadow: 0 4px 0 rgba(0,0,0,.35); }
+.flash .n { background: var(--crema); color: var(--escorca); border-radius: 18px; padding: 12px 16px; display: flex; flex-direction: column; gap: 6px; align-items: center; box-shadow: 0 12px 30px rgba(0,0,0,.45); max-width: 92%; }
+.flash .n b { font-size: 19px; }
+.flash .n i { font-size: 14px; color: #7a6250; }
+.flash .why { border: 0; background: transparent; color: var(--crema); font-weight: 800; font-size: 15px; text-decoration: underline; text-underline-offset: 3px; padding: 8px; }
+.timer { width: 140px; height: 4px; background: rgba(247,236,214,.2); border-radius: 4px; overflow: hidden; }
+.timer i { display: block; height: 100%; background: var(--crema); width: 100%; }
+.flash.show .timer i { animation: drain 1.6s linear forwards; }
+@keyframes drain { to { width: 0; } }
+
+/* Full de resultat */
+.sheet {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 5;
+  max-width: 460px; margin: 0 auto;
+  background: var(--crema); color: var(--escorca);
+  border-radius: 26px 26px 0 0;
+  padding: 0 20px 20px;
+  box-shadow: 0 -12px 40px rgba(0,0,0,.5);
+  transform: translateY(105%); transition: transform .38s cubic-bezier(.2,.85,.25,1);
+  display: flex; flex-direction: column; gap: 10px;
+  max-height: 78%; overflow-y: auto;
+}
+.sheet.open { transform: translateY(0); }
+.sheet .stripe { height: 8px; margin: 0 -20px 6px; }
+.sheet .verdict { font-family: var(--display); font-weight: 800; font-size: 28px; line-height: 1.05; text-wrap: balance; }
+.sheet .pts { font-weight: 800; font-size: 14px; font-variant-numeric: tabular-nums; }
+.sheet .name { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.sheet .name b { font-size: 19px; }
+.sheet .name i { color: #7a6250; font-size: 15px; }
+.badge { display: inline-block; color: #fff; font-weight: 800; font-size: 13px; padding: 4px 12px; border-radius: 99px; letter-spacing: .4px; text-transform: uppercase; }
+.sheet p { margin: 0; font-size: 15.5px; line-height: 1.45; max-width: 62ch; }
+.confusio { background: var(--crema-2); border-radius: 14px; padding: 10px 12px; font-size: 14px; line-height: 1.4; }
+.confusio b { color: var(--mort); }
+.next { margin-top: 4px; padding: 14px; border: 0; border-radius: 16px; background: var(--escorca); color: var(--crema); font-weight: 800; font-size: 16px; }
+
+/* Pantalles */
+.screen {
+  position: absolute; inset: 0; z-index: 10;
+  background: radial-gradient(ellipse at 50% 30%, #2f4224, #151d12 75%);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 14px; padding: 20px 20px 24px; text-align: center;
+  overflow-y: auto;
+}
+.screen[hidden] { display: none; }
+.logo { font-family: var(--display); font-weight: 800; font-size: clamp(54px, 17vw, 76px); line-height: .9; color: var(--crema); text-shadow: 0 4px 0 #0e140c; margin: 0; }
+.logo span { color: var(--rovello); }
+.tag { font-size: 17px; font-weight: 700; max-width: 30ch; margin: 0; color: #e8dcc0; text-wrap: balance; }
+.hero { width: min(100%, 360px); }
+.rules { display: grid; gap: 8px; width: min(100%, 360px); text-align: left; }
+.rule { display: flex; gap: 10px; align-items: center; background: rgba(247,236,214,.08); border: 1px solid rgba(247,236,214,.14); padding: 9px 12px; border-radius: 14px; font-size: 14.5px; font-weight: 600; }
+.rule svg { flex: none; width: 26px; height: 26px; }
+.big { padding: 16px 34px; border-radius: 20px; border: 0; background: var(--rovello); color: #2a1608; font-weight: 800; font-size: 18px; box-shadow: 0 5px 0 #8a4413; }
+.big:active { transform: translateY(3px); box-shadow: 0 2px 0 #8a4413; }
+.disc { font-size: 12.5px; color: #b9c4a4; max-width: 40ch; margin: 0; line-height: 1.45; }
+.endcard { background: var(--crema); color: var(--escorca); border-radius: 26px; padding: 20px; width: min(100%, 380px); display: flex; flex-direction: column; gap: 10px; box-shadow: 0 18px 40px rgba(0,0,0,.45); }
+.endcard h2 { font-family: var(--display); font-weight: 800; font-size: 30px; margin: 0; line-height: 1.05; text-wrap: balance; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.stat { background: var(--crema-2); border-radius: 14px; padding: 8px 4px; }
+.stat b { display: block; font-family: var(--display); font-size: 26px; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 12px; font-weight: 700; color: #7a6250; }
+.mortals { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.mortals .chip { background: #f3d4cc; color: var(--mort); }
+.ad {
+  width: min(100%, 380px); min-height: 70px; border-radius: 14px;
+  border: 2px dashed rgba(247,236,214,.3); color: #b9c4a4;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-size: 12.5px; font-weight: 700; gap: 2px;
+}
+.ad small { font-weight: 600; opacity: .8; }
+.linkbtn { background: none; border: 0; color: #c9d2b4; font-weight: 700; font-size: 13.5px; text-decoration: underline; text-underline-offset: 3px; padding: 6px; }
+#credits { justify-content: flex-start; text-align: left; }
+#credits h2 { font-family: var(--display); font-weight: 800; font-size: 30px; margin: 8px 0 0; }
+#credits .intro { font-size: 13.5px; color: #c9d2b4; margin: 0; line-height: 1.45; max-width: 60ch; }
+.clist { list-style: none; margin: 0; padding: 0; width: 100%; display: grid; gap: 6px; }
+.clist li { background: rgba(247,236,214,.07); border: 1px solid rgba(247,236,214,.12); border-radius: 12px; padding: 8px 12px; font-size: 13px; line-height: 1.4; }
+.clist b { color: var(--crema); }
+.clist a { color: #f0b45a; }
+.clist .who { color: #c9d2b4; }
+#credits .big { position: sticky; bottom: 0; align-self: center; flex: none; }
+@media (max-height: 640px) {
+  .hero { width: min(100%, 280px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card.anim, .sheet, .progress i, .flash { transition: none; }
+}
+</style>
+</head>
+<body>
+<canvas id="bg" aria-hidden="true"></canvas>
+<div id="app">
+  <header class="hud">
+    <div class="brand">Cistella<span>!</span></div>
+    <div class="lives" id="lives" aria-label="Vides"></div>
+    <div class="score"><span id="score">0</span><small id="count">punts</small></div>
+  </header>
+  <div class="progress"><i id="prog"></i></div>
+  <main class="stage" id="stage"></main>
+  <div class="flash" id="flash" aria-live="polite"></div>
+  <div class="controls">
+    <button class="act no" id="btnNo" aria-label="Deixar-lo al bosc">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20C4 8 12 3 21 3c0 9-5 17-17 17z" fill="currentColor"/><path d="M5 19L15 9" stroke="#4a3a26" stroke-width="2" stroke-linecap="round"/></svg>
+      Al bosc
+    </button>
+    <button class="act yes" id="btnYes" aria-label="Posar-lo a la cistella">
+      A la cistella
+      <svg viewBox="0 0 32 28" aria-hidden="true"><path d="M7 12Q16-3 25 12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M3 11h26l-3.5 14h-19z" fill="currentColor"/><path d="M9 14l1 9M16 14v9M23 14l-1 9" stroke="#e07a2e" stroke-width="1.6"/></svg>
+    </button>
+  </div>
+
+  <section class="sheet" id="sheet" aria-live="polite"></section>
+
+  <section class="screen" id="start">
+    <div class="hero" id="hero"></div>
+    <h1 class="logo">Cistella<span>!</span></h1>
+    <p class="tag">Aquest bolet, a la cistella o es queda al bosc?</p>
+    <div class="rules">
+      <div class="rule"><svg viewBox="0 0 32 28" aria-hidden="true"><path d="M7 12Q16-3 25 12" fill="none" stroke="#e07a2e" stroke-width="3" stroke-linecap="round"/><path d="M3 11h26l-3.5 14h-19z" fill="#e07a2e"/></svg>Llisca a la dreta si és comestible.</div>
+      <div class="rule"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20C4 8 12 3 21 3c0 9-5 17-17 17z" fill="#c9a24a"/></svg>A l'esquerra si no ho és, o si dubtes.</div>
+      <div class="rule"><svg viewBox="0 0 32 28" aria-hidden="true"><path d="M7 12Q16-3 25 12" fill="none" stroke="#f7ecd6" stroke-width="3" stroke-linecap="round"/><path d="M3 11h26l-3.5 14h-19z" fill="#f7ecd6"/></svg>Tens tres cistelles. Un bolet tòxic te'n fa perdre una.</div>
+      <div class="rule"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="11" r="8" fill="#a3201a"/><circle cx="9" cy="10" r="2" fill="#f7ecd6"/><circle cx="15" cy="10" r="2" fill="#f7ecd6"/><rect x="9" y="17" width="6" height="4" rx="1" fill="#a3201a"/></svg>Un de mortal acaba la partida de cop.</div>
+    </div>
+    <button class="big" id="btnStart">Anem a buscar bolets</button>
+    <p class="disc">És un joc, no una guia. Mai no mengis un bolet identificat amb una pantalla: porta'l a una associació micològica o a un expert.</p>
+    <button class="linkbtn" id="btnCred1">Crèdits de les fotos</button>
+  </section>
+
+  <section class="screen" id="end" hidden>
+    <div class="endcard">
+      <h2 id="endTitle">Sense cistelles</h2>
+      <p id="endText" style="margin:0;font-size:15px;line-height:1.4"></p>
+      <div class="stats">
+        <div class="stat"><b id="stScore">0</b><span>punts</span></div>
+        <div class="stat"><b id="stHits">0</b><span>encerts</span></div>
+        <div class="stat"><b id="stBest">0</b><span>rècord</span></div>
+      </div>
+      <div id="mortalWrap">
+        <div style="font-size:13px;font-weight:800;margin-bottom:6px">Els que maten, i ja els has vist:</div>
+        <div class="mortals" id="mortalList"></div>
+      </div>
+    </div>
+    <button class="big" id="btnAgain">Torna al bosc</button>
+    <div class="ad" role="note">Espai per a anunci<small>Prototip: aquí aniria el bàner d'AdSense o AdMob</small></div>
+    <button class="linkbtn" id="btnCred2">Crèdits de les fotos</button>
+    <p class="disc">Il·lustracions orientatives. Per identificar bolets cal veure'ls en mà: olor, làtex, base del peu, color en tallar-los.</p>
+  </section>
+  <section class="screen" id="credits" hidden>
+    <h2>Crèdits</h2>
+    <p class="intro">Les fotos són de persones que les comparteixen amb llicències lliures a iNaturalist i Wikimedia Commons. Gràcies! Al joc es mostren retallades per encaixar a la targeta.</p>
+    <ul class="clist" id="clist"></ul>
+    <button class="big" id="btnCredClose">Tanca</button>
+  </section>
+</div>
+
+<script>
+/* ------------------ Dades ------------------
+   Cada bolet té un camp foto/credit preparat per a fotos reals amb llicència
+   CC0, CC BY o CC BY-SA (les NC no permeten anuncis). */
+const CAT = {
+  comestible: { label: "Comestible", color: "var(--ok)" },
+  nocomestible: { label: "No comestible", color: "var(--no)" },
+  toxic: { label: "Tòxic", color: "var(--tox)" },
+  mortal: { label: "Mortal", color: "var(--mort)" }
+};
+
+const BOLETS = [
+  { id: "rovello", nom: "Rovelló", sci: "Lactarius sanguifluus", cat: "comestible",
+    pistes: ["Pinedes de terra baixa", "Tardor", "Barret de 5–12 cm"],
+    text: "Si el talles, treu un làtex de color vi. Té el barret en forma d'embut amb cercles concèntrics, es taca de verd i el peu té clotets.",
+    conf: ["torminosus"],
+    art: { shape: "funnel", w: 150, h: 46, cap: "#c07a52", capC: "#a65e3e", pat: "zones", patC: "#8e4b30", green: true, under: "gills", underC: "#c98a78", stemH: 55, sw: 32, stem: "#d4977c", stem2: "#b97a60", stemPat: "pits", stemPatC: "#a05a40", sub: "pine" } },
+  { id: "torminosus", nom: "Lactarius torminosus", sci: "Lactarius torminosus", cat: "toxic",
+    pistes: ["Prop de bedolls", "Tardor", "Barret de 4–10 cm"],
+    text: "Provoca trastorns digestius forts. Té el marge del barret pelut i el làtex és blanc, mai de color vi ni taronja.",
+    conf: ["rovello", "pinetell"],
+    art: { shape: "funnel", w: 160, h: 48, cap: "#f0b3a0", capC: "#d98f7c", pat: "zones", patC: "#cf7f6c", hairs: "#fbe4da", under: "gills", underC: "#f6e7d8", stemH: 70, sw: 30, stem: "#f3d6c8", stem2: "#e2b9a6", sub: "oak" } },
+  { id: "cep", nom: "Cep", sci: "Boletus edulis", cat: "comestible",
+    pistes: ["Pinedes i fagedes", "Estiu i tardor", "Barret de 8–25 cm"],
+    text: "Comestible excel·lent. Porus blanquinosos o groguencs, mai vermells, i peu gruixut amb una xarxa fina i clara.",
+    conf: ["tylopilus", "mataparent"],
+    art: { shape: "convex", w: 170, h: 75, cap: "#9a6438", capC: "#6b3d1f", under: "pores", underC: "#efe2b0", stemH: 110, sw: 58, base: "club", stem: "#e2cfa5", stem2: "#cdb488", stemPat: "net", stemPatC: "#fbf4e2", sub: "pine" } },
+  { id: "mataparent", nom: "Mataparent", sci: "Rubroboletus satanas", cat: "toxic",
+    pistes: ["Alzinars i rouredes", "Estiu i tardor", "Barret de 10–30 cm"],
+    text: "Provoca vòmits intensos. Barret blanquinós, porus vermells, peu ventrut vermellós i carn que es torna blava en tallar-la.",
+    conf: ["cep"],
+    art: { shape: "convex", w: 175, h: 70, cap: "#ddd6c8", capC: "#cdc4b2", under: "pores", underC: "#c8342a", stemH: 100, sw: 66, base: "club", stem: "#e7b44a", stem2: "#c94a32", stemPat: "net", stemPatC: "#a82a1e", sub: "oak" } },
+  { id: "tylopilus", nom: "Tylopilus felleus", sci: "Tylopilus felleus", cat: "nocomestible",
+    pistes: ["Pinedes", "Estiu i tardor", "Barret de 6–15 cm"],
+    text: "No és perillós, però és tan amarg que espatlla qualsevol plat. Porus rosats i xarxa fosca al peu.",
+    conf: ["cep"],
+    art: { shape: "convex", w: 160, h: 70, cap: "#b48553", capC: "#9a6c3f", under: "pores", underC: "#ecc9be", stemH: 110, sw: 50, base: "club", stem: "#d8bf98", stem2: "#b89a70", stemPat: "net", stemPatC: "#6b4a2b", sub: "pine" } },
+  { id: "oureig", nom: "Ou de reig", sci: "Amanita caesarea", cat: "comestible",
+    pistes: ["Alzinars i castanyedes", "Final d'estiu", "Barret de 8–20 cm"],
+    text: "Molt apreciat. Barret taronja, làmines i peu grocs, i una volva blanca a la base. No l'agafis mai quan encara és un ou tancat: per dins podria ser una farinera borda.",
+    conf: ["reigbord"],
+    art: { shape: "flat", w: 175, h: 62, cap: "#f3801c", capC: "#e0560f", pat: "striate", patC: "#f6b13c", under: "gills", underC: "#f6c832", stemH: 150, sw: 30, stem: "#f8d64e", stem2: "#efc23a", ring: "#f8d64e", volva: "sac", volvaC: "#fbf8f0", base: "bulb", sub: "oak" } },
+  { id: "reigbord", nom: "Reig bord", sci: "Amanita muscaria", cat: "toxic",
+    pistes: ["Pinedes i bedolls", "Tardor", "Barret de 8–20 cm"],
+    text: "Barret vermell amb berrugues blanques i làmines blanques. La pluja li pot rentar les berrugues i fer-lo semblar un ou de reig.",
+    conf: ["oureig"],
+    art: { shape: "flat", w: 175, h: 65, cap: "#e0291f", capC: "#b8160f", pat: "warts", patC: "#fffaf0", under: "gills", underC: "#fbf7ee", stemH: 150, sw: 30, stem: "#fbf7ee", stem2: "#ece6da", ring: "#fbf7ee", volva: "collar", base: "bulb", sub: "pine" } },
+  { id: "farinera", nom: "Farinera borda", sci: "Amanita phalloides", cat: "mortal",
+    pistes: ["Alzinars i rouredes", "Tardor", "Barret de 5–15 cm"],
+    text: "Causa la majoria de morts per bolets. Barret verd oliva, làmines blanques, anell i una volva en forma de sac. Els símptomes arriben hores després, quan el fetge ja està afectat.",
+    conf: ["llora", "camperol"],
+    art: { shape: "convex", w: 160, h: 60, cap: "#b6b77a", capC: "#8f8a52", pat: "fibrils", patC: "#6f6c3c", under: "gills", underC: "#fbf9f0", stemH: 140, sw: 26, stem: "#f4f2e6", stem2: "#e4e6cf", stemPat: "snake", stemPatC: "#d4d7b4", ring: "#f8f6ec", volva: "sac", volvaC: "#fbf9f2", base: "bulb", sub: "oak" } },
+  { id: "llora", nom: "Llora", sci: "Russula virescens", cat: "comestible",
+    pistes: ["Alzinars i rouredes", "Estiu i tardor", "Barret de 5–12 cm"],
+    text: "Comestible, però només per a gent experta. Barret verd amb la pell clivellada, sense anell ni volva. Confondre-la amb una farinera borda pot ser mortal.",
+    conf: ["farinera"],
+    art: { shape: "flat", w: 165, h: 50, cap: "#8fb06e", capC: "#7c9a5c", pat: "cracks", patC: "#d6dfb6", under: "gills", underC: "#f7f2e3", stemH: 90, sw: 38, stem: "#f7f4ea", stem2: "#e8e2d2", sub: "oak" } },
+  { id: "rossinyol", nom: "Rossinyol", sci: "Cantharellus cibarius", cat: "comestible",
+    pistes: ["Alzinars i pinedes", "Estiu i tardor", "Barret de 3–10 cm"],
+    text: "No té làmines de veritat, sinó plecs gruixuts que baixen pel peu. Fa olor afruitada, d'albercoc.",
+    conf: ["omphalotus"],
+    art: { shape: "funnel", w: 130, h: 52, cap: "#f3b733", capC: "#e9a21f", under: "ridges", underC: "#f6c24a", stemH: 55, sw: 30, stem: "#f5bd3e", stem2: "#e7a52a", count: 2, sub: "oak" } },
+  { id: "omphalotus", nom: "Omphalotus olearius", sci: "Omphalotus olearius", cat: "toxic",
+    pistes: ["Soques d'olivera i alzina", "Tardor", "En grups"],
+    text: "Provoca vòmits i diarrees. Creix en grups sobre fusta, de soques o arrels, i té làmines de veritat, fines i atapeïdes.",
+    conf: ["rossinyol"],
+    art: { shape: "funnel", w: 120, h: 45, cap: "#e86a1b", capC: "#d2530f", under: "gills", underC: "#f07a22", stemH: 80, sw: 22, stem: "#e4741e", stem2: "#c95a14", count: 3, sub: "log" } },
+  { id: "girgola", nom: "Gírgola", sci: "Pleurotus ostreatus", cat: "comestible",
+    pistes: ["Troncs de pollancre i plàtan", "Tardor i hivern", "Ventalls de 5–15 cm"],
+    text: "Creix en ventalls superposats sobre troncs. Làmines blanques que baixen fins a un peu molt curt o inexistent.",
+    conf: [],
+    art: { shape: "shelf", cap: "#8c8278", capC: "#6e655c", under: "gills", underC: "#f4efe6", sub: "trunk" } },
+  { id: "apagallums", nom: "Apagallums", sci: "Macrolepiota procera", cat: "comestible",
+    pistes: ["Prats i clarianes", "Tardor", "Barret de 15–30 cm"],
+    text: "Pot fer més de 25 cm. Té un anell doble que es pot moure amunt i avall i el peu atigrat. Regla d'or: cap lepiota petita.",
+    conf: ["brunneo"],
+    art: { shape: "umbrella", w: 230, h: 55, cap: "#ecdfc6", capC: "#7a5636", pat: "scales", patC: "#8a6440", under: "gills", underC: "#fbf6ea", stemH: 200, sw: 20, stem: "#e8dcc4", stem2: "#d8c8a8", stemPat: "snake", stemPatC: "#8a6a4a", ring: "#f4ecdc", ringType: "collar", base: "bulb", sub: "grass" } },
+  { id: "brunneo", nom: "Lepiota brunneoincarnata", sci: "Lepiota brunneoincarnata", cat: "mortal",
+    pistes: ["Prats, parcs i jardins", "Tardor", "Barret de 3–5 cm"],
+    text: "Té la mateixa toxina que la farinera borda. Sembla un apagallums en miniatura, amb esquames rosades. No mengis mai una lepiota de menys de 10 cm.",
+    conf: ["apagallums"],
+    art: { shape: "umbrella", w: 150, h: 40, cap: "#d4ad96", capC: "#8a5444", pat: "scales", patC: "#8f5847", under: "gills", underC: "#f6eee6", stemH: 120, sw: 16, stem: "#efe2d8", stem2: "#c99a88", stemPat: "bands", stemPatC: "#9a6352", scale: .55, sub: "grass" } },
+  { id: "fredolic", nom: "Fredolic", sci: "Tricholoma terreum", cat: "comestible",
+    pistes: ["Pinedes", "Final de tardor", "Barret de 3–7 cm"],
+    text: "Petit, gris ratolí i de tacte vellutat. Surt en grups a les pinedes quan ja fa fred.",
+    conf: ["pardinum"],
+    art: { shape: "umbrella", w: 100, h: 45, cap: "#7a746f", capC: "#5d5853", pat: "felt", patC: "#4d4844", under: "gills", underC: "#ebe6e0", stemH: 70, sw: 20, stem: "#f1eeea", stem2: "#ddd8d0", count: 3, sub: "pine" } },
+  { id: "pardinum", nom: "Fredolic bord", sci: "Tricholoma pardinum", cat: "toxic",
+    pistes: ["Boscos de muntanya", "Tardor", "Barret de 6–15 cm"],
+    text: "Provoca una gastroenteritis forta. És més gros i robust que el fredolic, amb esquames gris fosc sobre fons clar.",
+    conf: ["fredolic"],
+    art: { shape: "convex", w: 175, h: 70, cap: "#c4beb6", capC: "#9a938b", pat: "scales", patC: "#55504b", under: "gills", underC: "#efe9d8", stemH: 100, sw: 44, stem: "#f3efe6", stem2: "#ddd6c8", sub: "pine" } },
+  { id: "orellanus", nom: "Cortinarius orellanus", sci: "Cortinarius orellanus", cat: "mortal",
+    pistes: ["Alzinars i rouredes", "Tardor", "Barret de 3–8 cm"],
+    text: "Destrueix els ronyons. Els símptomes poden trigar de dos dies a tres setmanes, i quan arriben el mal ja està fet. Làmines color de rovell.",
+    conf: [],
+    art: { shape: "umbrella", w: 120, h: 50, cap: "#b8642d", capC: "#9c4f22", pat: "fibrils", patC: "#7f3d18", under: "gills", underC: "#a95b2a", stemH: 110, sw: 18, stem: "#d9a463", stem2: "#c58a4a", sub: "oak" } },
+  { id: "camperol", nom: "Camperol", sci: "Agaricus campestris", cat: "comestible",
+    pistes: ["Prats amb bestiar", "Primavera i tardor", "Barret de 4–10 cm"],
+    text: "Làmines rosades que es tornen marró xocolata. No té volva i no groguesa en fregar-lo.",
+    conf: ["xanthodermus", "verna"],
+    art: { shape: "convex", w: 140, h: 60, cap: "#f6f1e8", capC: "#ece2d2", pat: "fibrils", patC: "#d9cdb9", under: "gills", underC: "#e59a9b", stemH: 70, sw: 28, stem: "#f6f1e8", stem2: "#e6dccb", ring: "#f3eee4", ringSmall: true, sub: "grass" } },
+  { id: "xanthodermus", nom: "Agaricus xanthodermus", sci: "Agaricus xanthodermus", cat: "toxic",
+    pistes: ["Parcs, jardins i vores", "Tardor", "Barret de 5–15 cm"],
+    text: "Si en fregues la base del peu es torna groc intens, i fa olor de tinta o de iode. Provoca trastorns digestius.",
+    conf: ["camperol"],
+    art: { shape: "trapezoid", w: 150, h: 65, cap: "#f5f2ec", capC: "#e9e3d6", pat: "stain", patC: "#f1d23a", under: "gills", underC: "#c7a2a3", stemH: 110, sw: 26, stem: "#f5f2ec", stem2: "#f0d84a", ring: "#fbf9f4", base: "bulb", sub: "grass" } },
+  { id: "verna", nom: "Farinera borda blanca", sci: "Amanita verna", cat: "mortal",
+    pistes: ["Alzinars i rouredes", "Primavera", "Barret de 4–10 cm"],
+    text: "Tota blanca, amb anell i volva en sac. Té les mateixes toxines que la farinera borda. Un bolet blanc amb volva no s'agafa mai.",
+    conf: ["camperol"],
+    art: { shape: "convex", w: 140, h: 60, cap: "#fcfbf7", capC: "#f2efe6", under: "gills", underC: "#fdfcf8", stemH: 140, sw: 24, stem: "#fcfbf7", stem2: "#ece8dc", ring: "#fdfcf8", volva: "sac", volvaC: "#fdfcf8", base: "bulb", sub: "oak" } },
+  { id: "pantherina", nom: "Amanita pantherina", sci: "Amanita pantherina", cat: "toxic",
+    pistes: ["Alzinars i pinedes", "Estiu i tardor", "Barret de 5–12 cm"],
+    text: "Pot causar una intoxicació greu. Barret marró amb berrugues blanques i marge estriat; a la base, una volva en forma de collaret.",
+    conf: [],
+    art: { shape: "flat", w: 165, h: 55, cap: "#9a7650", capC: "#6f5136", pat: "warts", patC: "#fbf6ec", striate: "#6a4c32", under: "gills", underC: "#fbf8f0", stemH: 130, sw: 26, stem: "#fbf8f0", stem2: "#ebe4d6", ring: "#fbf8f0", volva: "collar", base: "bulb", sub: "oak" } },
+  { id: "moixerno", nom: "Moixernó", sci: "Calocybe gambosa", cat: "comestible",
+    pistes: ["Prats i marges", "Primavera", "Barret de 5–15 cm"],
+    text: "Surt a la primavera, sovint en cercles als prats. Carnós i blanc crema, amb làmines blanques molt atapeïdes i una olor intensa de farina.",
+    conf: ["inocybe", "entoloma"],
+    art: { shape: "convex", w: 150, h: 62, cap: "#f2ead8", capC: "#e6d9bd", under: "gills", underC: "#f7f2e6", stemH: 70, sw: 36, stem: "#f4eee2", stem2: "#e6dccb", count: 2, sub: "grass" } },
+  { id: "entoloma", nom: "Entoloma sinuatum", sci: "Entoloma sinuatum", cat: "toxic",
+    pistes: ["Rouredes i fagedes", "Tardor", "Barret de 8–20 cm"],
+    text: "Provoca una gastroenteritis molt forta que pot durar dies. També fa olor de farina, com el moixernó, però surt a la tardor i les làmines, groguenques, es tornen rosades.",
+    conf: ["moixerno"],
+    art: { shape: "flat", w: 175, h: 55, cap: "#d9d2c4", capC: "#c4b9a6", pat: "fibrils", patC: "#b5aa96", under: "gills", underC: "#ecd3bd", stemH: 90, sw: 38, stem: "#f1ece2", stem2: "#e0d8ca", sub: "oak" } },
+  { id: "camasec", nom: "Cama-sec", sci: "Marasmius oreades", cat: "comestible",
+    pistes: ["Prats", "Primavera i tardor", "Barret de 2–5 cm"],
+    text: "Creix en cercles als prats. El peu és prim i elàstic: el pots retorçar sense que es trenqui. Làmines separades.",
+    conf: ["dealbata"],
+    art: { shape: "umbrella", w: 70, h: 30, cap: "#d9b98c", capC: "#b88f5e", under: "gills", underC: "#efe0c4", stemH: 70, sw: 9, stem: "#e3cca6", stem2: "#cdb085", count: 3, sub: "grass" } },
+  { id: "dealbata", nom: "Clitocybe dealbata", sci: "Clitocybe dealbata", cat: "toxic",
+    pistes: ["Prats i gespes", "Estiu i tardor", "Barret de 2–4 cm"],
+    text: "Conté muscarina: suors, salivació i vòmits poc després de menjar-lo. És petit i blanquinós, i creix als mateixos prats que el cama-sec.",
+    conf: ["camasec"],
+    art: { shape: "flat", w: 64, h: 18, cap: "#f2eee6", capC: "#e4ddd0", under: "gills", underC: "#f4f0e8", stemH: 40, sw: 10, stem: "#efe9de", stem2: "#e2dacb", count: 3, sub: "grass" } },
+  { id: "murgola", nom: "Múrgola", sci: "Morchella esculenta", cat: "comestible",
+    pistes: ["Boscos de ribera i cremats", "Primavera", "5–15 cm d'alçada"],
+    text: "Comestible només ben cuita: crua és tòxica. El barret té alvèols com un rusc i, si la talles, és tota buida per dins.",
+    conf: ["gyromitra"],
+    art: { shape: "morel", w: 78, h: 115, cap: "#c69a5e", capC: "#b4864a", pat: "honeycomb", patC: "#5e3d1d", stemH: 60, sw: 36, stem: "#efe2c6", stem2: "#dccaa4", sub: "oak" } },
+  { id: "gyromitra", nom: "Gyromitra esculenta", sci: "Gyromitra esculenta", cat: "mortal",
+    pistes: ["Pinedes de muntanya", "Primavera", "Barret de 4–12 cm"],
+    text: "Pot ser mortal, fins i tot cuita. El barret no té alvèols: és arrugat i rebregat com un cervell, i per dins té cambres irregulars.",
+    conf: ["murgola"],
+    art: { shape: "brain", w: 115, h: 78, cap: "#8a3f24", capC: "#6e2e18", pat: "folds", patC: "#4a1c0c", stemH: 50, sw: 40, stem: "#efe6da", stem2: "#ddd0bf", sub: "pine" } },
+  { id: "pinetell", nom: "Pinetell", sci: "Lactarius deliciosus", cat: "comestible",
+    pistes: ["Pinedes de muntanya", "Tardor", "Barret de 5–12 cm"],
+    text: "Parent del rovelló, però més clar, de color ocre ataronjat, i amb un làtex de color pastanaga, no de vi. També es taca de verd. Molta gent en diu rovelló.",
+    conf: ["rovello", "torminosus"],
+    art: { shape: "funnel", w: 170, h: 52, cap: "#e3843a", capC: "#c9632a", pat: "zones", patC: "#b8521e", green: true, under: "gills", underC: "#f0a050", stemH: 70, sw: 36, stem: "#f2a35a", stem2: "#e08a3e", stemPat: "pits", stemPatC: "#cf6a25", sub: "pine" } },
+  { id: "llenega", nom: "Llenega negra", sci: "Hygrophorus latitabundus", cat: "comestible",
+    pistes: ["Pinedes de terreny calcari", "Final de tardor i hivern", "Barret de 5–15 cm"],
+    text: "Barret gris fosc i peu cobert d'una capa viscosa, com mocs. Surt amb el fred i aguanta les primeres glaçades.",
+    conf: [],
+    art: { shape: "umbrella", w: 160, h: 55, cap: "#6c6458", capC: "#3f382f", pat: "gloss", under: "gills", underC: "#f4f0e6", stemH: 110, sw: 30, stem: "#f0ebe0", stem2: "#d8d0c0", stemPat: "pits", stemPatC: "#8a826f", sub: "pine" } },
+  { id: "tinta", nom: "Bolet de tinta", sci: "Coprinus comatus", cat: "comestible",
+    pistes: ["Prats i vores de camins", "Tardor", "Barret de 5–15 cm d'alt"],
+    text: "Comestible només jove, quan les làmines encara són blanques. En poques hores es desfà en un líquid negre, com tinta.",
+    conf: ["atramentaria"],
+    art: { shape: "bell", w: 62, h: 130, cap: "#f4efe6", capC: "#e6dccb", pat: "shaggy", patC: "#a08466", ink: true, stemH: 70, sw: 18, stem: "#f6f2ea", stem2: "#e6e0d4", sub: "grass" } },
+  { id: "atramentaria", nom: "Coprinopsis atramentaria", sci: "Coprinopsis atramentaria", cat: "toxic",
+    pistes: ["Jardins i vores de camins", "Primavera i tardor", "Barret de 3–7 cm"],
+    text: "Amb alcohol provoca una intoxicació forta: vermellor, palpitacions i vòmits, fins i tot si beus uns dies després de menjar-lo.",
+    conf: ["tinta"],
+    art: { shape: "bell", w: 80, h: 78, cap: "#b0a79b", capC: "#8f857a", pat: "ribs", patC: "#7a7064", ink: true, stemH: 70, sw: 16, stem: "#f1ede6", stem2: "#ddd6ca", count: 3, sub: "grass" } },
+  { id: "galerina", nom: "Galerina marginata", sci: "Galerina marginata", cat: "mortal",
+    pistes: ["Soques i fusta morta", "Tardor", "Barret de 2–5 cm"],
+    text: "Té les mateixes toxines que la farinera borda. És petita, marró, té un anell fi al peu i creix en grups sobre soques, com alguns bolets de soca comestibles.",
+    conf: ["hypholoma"],
+    art: { shape: "umbrella", w: 64, h: 26, cap: "#b8792e", capC: "#8f5a1e", under: "gills", underC: "#c0874a", stemH: 50, sw: 9, stem: "#c9a578", stem2: "#6e4a2a", ring: "#a86d3a", ringSmall: true, count: 3, sub: "log" } },
+  { id: "hypholoma", nom: "Hypholoma fasciculare", sci: "Hypholoma fasciculare", cat: "toxic",
+    pistes: ["Soques i arrels", "Gairebé tot l'any", "Barret de 2–6 cm"],
+    text: "Groc sofre, en grups atapeïts sobre soques. Làmines verdoses i gust molt amarg. Provoca trastorns digestius.",
+    conf: ["galerina"],
+    art: { shape: "umbrella", w: 72, h: 30, cap: "#e2b84a", capC: "#c47a2a", under: "gills", underC: "#b2ab52", stemH: 70, sw: 10, stem: "#e8c45c", stem2: "#b8862e", count: 3, sub: "log" } },
+  { id: "pimpinella", nom: "Pimpinella morada", sci: "Lepista nuda", cat: "comestible",
+    pistes: ["Fullaraca de boscos", "Tardor i hivern", "Barret de 5–15 cm"],
+    text: "Té tons lila o violeta, sobretot a les làmines i al peu, i fa olor afruitada. Comestible només ben cuita.",
+    conf: [],
+    art: { shape: "flat", w: 150, h: 52, cap: "#8e7aa3", capC: "#6f5a80", under: "gills", underC: "#b49ac8", stemH: 70, sw: 30, stem: "#b7a3cc", stem2: "#9a85b3", base: "bulb", sub: "oak" } },
+  { id: "carlet", nom: "Carlet", sci: "Hygrophorus russula", cat: "comestible",
+    pistes: ["Alzinars i rouredes", "Tardor", "Barret de 5–12 cm"],
+    text: "Barret robust de color vermell vinós, làmines blanques que es taquen de vi i carn ferma. Surt en grups sota alzines i roures.",
+    conf: ["emetica"],
+    art: { shape: "convex", w: 160, h: 62, cap: "#b3485a", capC: "#8e2f45", pat: "fibrils", patC: "#7a2236", under: "gills", underC: "#efd9dc", stemH: 70, sw: 40, stem: "#f0dfe0", stem2: "#d6a8b0", sub: "oak" } },
+  { id: "emetica", nom: "Russula emetica", sci: "Russula emetica", cat: "toxic",
+    pistes: ["Pinedes humides i molsa", "Estiu i tardor", "Barret de 4–9 cm"],
+    text: "Provoca vòmits. Barret vermell viu i làmines i peu blancs i fràgils. Té un gust molt picant: moltes russules vermelles no són comestibles.",
+    conf: ["carlet"],
+    art: { shape: "flat", w: 130, h: 40, cap: "#d8232a", capC: "#c01a20", pat: "gloss", under: "gills", underC: "#fbf6ea", stemH: 70, sw: 26, stem: "#fbf8f2", stem2: "#ebe5da", sub: "pine" } },
+  { id: "nebularis", nom: "Clitocybe nebularis", sci: "Clitocybe nebularis", cat: "toxic",
+    pistes: ["Fullaraca de boscos", "Tardor", "Barret de 8–20 cm"],
+    text: "Abans es menjava, però avui es desaconsella: provoca trastorns digestius a molta gent. Barret gris cendra, làmines crema i olor forta.",
+    conf: [],
+    art: { shape: "convex", w: 175, h: 58, cap: "#a9a49b", capC: "#8d887e", under: "gills", underC: "#f1ece0", stemH: 90, sw: 40, stem: "#ebe6da", stem2: "#d6cfc0", base: "club", sub: "oak" } },
+  { id: "inocybe", nom: "Inocybe erubescens", sci: "Inocybe erubescens", cat: "toxic",
+    pistes: ["Parcs i boscos de planifolis", "Primavera", "Barret de 3–8 cm"],
+    text: "Pot ser molt greu: té molta muscarina. Surt a la primavera com el moixernó, però el barret és fibrós, acabat en punta, i es taca de vermell.",
+    conf: ["moixerno"],
+    art: { shape: "umbrella", w: 95, h: 48, cap: "#efe3d0", capC: "#e0c8a8", pat: "fibrils", patC: "#d0785a", under: "gills", underC: "#d8c8a6", stemH: 70, sw: 16, stem: "#f3ebdf", stem2: "#e9b7a0", sub: "oak" } },
+  { id: "bolaneu", nom: "Bola de neu", sci: "Agaricus arvensis", cat: "comestible",
+    pistes: ["Prats i clarianes", "Tardor", "Barret de 8–20 cm"],
+    text: "Blanca, grossa i amb un anell ample. Fa olor d'anís i groguenca lentament quan la fregues. Si fa olor de tinta o de iode, no la cullis.",
+    conf: ["xanthodermus", "verna"],
+    art: { shape: "convex", w: 165, h: 68, cap: "#f5f0e4", capC: "#efe3c8", pat: "stain", patC: "#ecd98c", under: "gills", underC: "#d9b9b3", stemH: 100, sw: 32, stem: "#f5f0e4", stem2: "#e6dccb", ring: "#fbf8f1", sub: "grass" } },
+  { id: "paxillus", nom: "Paxillus involutus", sci: "Paxillus involutus", cat: "mortal",
+    pistes: ["Boscos humits", "Estiu i tardor", "Barret de 5–12 cm"],
+    text: "Durant anys es va menjar, fins que es va veure que pot provocar una reacció immunitària mortal, fins i tot cuit. Marge enrotllat cap a dins i làmines que es taquen de marró en tocar-les.",
+    conf: [],
+    art: { shape: "funnel", w: 150, h: 45, cap: "#9a7650", capC: "#7e5c3a", pat: "zones", patC: "#6f4f30", under: "gills", underC: "#c9a46a", stemH: 55, sw: 30, stem: "#a88458", stem2: "#8a6a44", sub: "oak" } },
+  { id: "petllop", nom: "Pet de llop", sci: "Lycoperdon perlatum", cat: "comestible",
+    pistes: ["Boscos i prats", "Estiu i tardor", "3–6 cm"],
+    text: "Comestible només jove, si per dins és blanc i uniforme. Talla'l sempre de dalt a baix: si s'hi veu la silueta d'un bolet, és un ou d'amanita i pot ser mortal.",
+    conf: ["scleroderma", "farinera"],
+    art: { shape: "ball", w: 70, h: 80, cap: "#f1e9d8", capC: "#e2d4b6", pat: "spines", patC: "#c8b48e", stemH: 0, sw: 34, count: 2, sub: "oak" } },
+  { id: "scleroderma", nom: "Scleroderma citrinum", sci: "Scleroderma citrinum", cat: "toxic",
+    pistes: ["Boscos i vores de camins", "Estiu i tardor", "4–10 cm"],
+    text: "Provoca vòmits i marejos. Escorça dura, groguenca i clivellada com una pell de serp, i per dins de seguida es torna negre violaci.",
+    conf: ["petllop"],
+    art: { shape: "ball", w: 88, h: 70, cap: "#cfae64", capC: "#b8924a", pat: "cracks", patC: "#8a6a2e", stemH: 0, sw: 40, sub: "oak" } },
+  { id: "camagroc", nom: "Camagroc", sci: "Craterellus lutescens", cat: "comestible",
+    pistes: ["Pinedes humides i molsa", "Final de tardor", "Barret de 2–5 cm"],
+    text: "Barret bru en forma d'embut i peu groc ataronjat, buit per dins. Per sota és gairebé llis, sense làmines. Surt en grups nombrosos.",
+    conf: [],
+    art: { shape: "funnel", w: 72, h: 30, cap: "#8a6a4a", capC: "#5e4630", under: "ridges", underC: "#f0b24a", stemH: 62, sw: 12, stem: "#f2a640", stem2: "#e08a2a", count: 3, sub: "pine" } },
+  { id: "trompeta", nom: "Trompeta de la mort", sci: "Craterellus cornucopioides", cat: "comestible",
+    pistes: ["Fagedes i alzinars", "Tardor", "2–8 cm d'ample"],
+    text: "Malgrat el nom, és un comestible excel·lent. Té forma de trompeta negra, buida fins a la base, i per sota és llisa i grisa.",
+    conf: [],
+    art: { shape: "funnel", w: 88, h: 88, cap: "#3a332e", capC: "#120e0c", under: "smooth", underC: "#6e6862", stemH: 26, sw: 16, stem: "#5a524c", stem2: "#3a332e", count: 3, sub: "oak" } }
+];
+const BY_ID = Object.fromEntries(BOLETS.map(b => [b.id, b]));
+
+/* ------------------ Utilitats ------------------ */
+function hash(s) { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
+function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function mix(hex, to, amt) {
+  const a = parseInt(hex.slice(1), 16), b = parseInt(to.slice(1), 16);
+  const r = Math.round(((a >> 16) & 255) * (1 - amt) + ((b >> 16) & 255) * amt);
+  const g = Math.round(((a >> 8) & 255) * (1 - amt) + ((b >> 8) & 255) * amt);
+  const bl = Math.round((a & 255) * (1 - amt) + (b & 255) * amt);
+  return "#" + ((1 << 24) | (r << 16) | (g << 8) | bl).toString(16).slice(1);
+}
+const dark = (c, a) => mix(c, "#000000", a);
+const light = (c, a) => mix(c, "#ffffff", a);
+const f = n => Math.round(n * 10) / 10;
+function shuffle(arr, r = Math.random) { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+/* ------------------ Il·lustració ------------------ */
+function capPath(shape, w, h) {
+  const W = w / 2;
+  switch (shape) {
+    case "flat": return `M${-W},0 C${-W},${-h * .7} ${-w * .28},${-h} 0,${-h} C${w * .28},${-h} ${W},${-h * .7} ${W},0 Q0,${h * .12} ${-W},0Z`;
+    case "umbrella": return `M${-W},0 C${-w * .42},${-h * .45} ${-w * .2},${-h * .7} ${-w * .1},${-h * .85} Q0,${-h * 1.1} ${w * .1},${-h * .85} C${w * .2},${-h * .7} ${w * .42},${-h * .45} ${W},0 Q0,${h * .1} ${-W},0Z`;
+    case "trapezoid": return `M${-W},0 C${-W},${-h * .6} ${-w * .4},${-h} ${-w * .25},${-h} L${w * .25},${-h} C${w * .4},${-h} ${W},${-h * .6} ${W},0 Q0,${h * .12} ${-W},0Z`;
+    case "ball": return `M${-w * .3},0 C${-w * .58},${-h * .2} ${-w * .58},${-h} 0,${-h} C${w * .58},${-h} ${w * .58},${-h * .2} ${w * .3},0 Q0,${h * .08} ${-w * .3},0Z`;
+    case "morel": return `M${-W},0 C${-W},${-h * .6} ${-w * .15},${-h} 0,${-h} C${w * .15},${-h} ${W},${-h * .6} ${W},0 Q0,${h * .06} ${-W},0Z`;
+    case "brain": return `M${-W},0 C${-w * .6},${-h * .5} ${-w * .35},${-h * 1.05} ${-w * .1},${-h * .9} C0,${-h * 1.1} ${w * .2},${-h * 1.05} ${w * .3},${-h * .85} C${w * .6},${-h * .8} ${w * .6},${-h * .2} ${W},0 Q0,${h * .1} ${-W},0Z`;
+    case "bell": return `M${-W},0 L${-W},${-h * .72} C${-W},${-h * 1.07} ${W},${-h * 1.07} ${W},${-h * .72} L${W},0 Q0,${h * .06} ${-W},0Z`;
+    default: return `M${-W},0 C${-W},${-h * 1.33} ${W},${-h * 1.33} ${W},0 Q0,${h * .12} ${-W},0Z`;
+  }
+}
+
+function stemPath(a) {
+  const H = a.stemH, s = a.sw;
+  if (a.base === "club") return `M${-s * .38},${-H} C${-s * .45},${-H * .55} ${-s * .85},${-H * .25} ${-s * .6},0 Q0,${s * .15} ${s * .6},0 C${s * .85},${-H * .25} ${s * .45},${-H * .55} ${s * .38},${-H}Z`;
+  if (a.base === "bulb") return `M${-s * .4},${-H} C${-s * .45},${-H * .5} ${-s * .5},${-s * 1.2} ${-s * .5},${-s * .8} C${-s * .95},${-s * .6} ${-s * .85},0 ${-s * .45},0 Q0,${s * .12} ${s * .45},0 C${s * .85},0 ${s * .95},${-s * .6} ${s * .5},${-s * .8} C${s * .5},${-s * 1.2} ${s * .45},${-H * .5} ${s * .4},${-H}Z`;
+  return `M${-s * .42},${-H} C${-s * .45},${-H * .5} ${-s * .5},${-H * .2} ${-s * .5},0 Q0,${s * .12} ${s * .5},0 C${s * .5},${-H * .2} ${s * .45},${-H * .5} ${s * .42},${-H}Z`;
+}
+
+function shroom(a, id, r) {
+  const H = a.stemH, s = a.sw, w = a.w, h = a.h;
+  let o = "";
+  const defs = `
+    <linearGradient id="${id}st" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${a.stem || a.cap}"/><stop offset="1" stop-color="${a.stem2 || dark(a.stem || a.cap, .08)}"/></linearGradient>
+    <radialGradient id="${id}cap" cx=".5" cy=".05" r=".95"><stop offset="0" stop-color="${a.capC}"/><stop offset=".75" stop-color="${a.cap}"/><stop offset="1" stop-color="${dark(a.cap, .08)}"/></radialGradient>
+    <clipPath id="${id}sc"><path d="${stemPath(a)}"/></clipPath>
+    <clipPath id="${id}cc"><path transform="translate(0,${-H})" d="${capPath(a.shape, w, h)}"/></clipPath>`;
+  o += `<defs>${defs}</defs>`;
+
+  if (a.shape === "funnel") {
+    // peu
+    o += stemShapes(a, id, r);
+    // con de làmines
+    const cone = `M${-w / 2},${-H - h} C${-w * .35},${-H - h * .55} ${-s * .6},${-H - h * .2} ${-s * .45},${-H} L${s * .45},${-H} C${s * .6},${-H - h * .2} ${w * .35},${-H - h * .55} ${w / 2},${-H - h}Z`;
+    o += `<path d="${cone}" fill="${a.underC}"/>`;
+    const n = a.under === "ridges" ? 11 : a.under === "smooth" ? 0 : 22;
+    const lc = dark(a.underC, a.under === "ridges" ? .18 : .12);
+    for (let i = 1; i < n; i++) {
+      const t = i / n, x0 = -w / 2 + w * t, x1 = -s * .45 + s * .9 * t;
+      o += `<path d="M${f(x0)},${f(-H - h + 2)} Q${f((x0 + x1) / 2 * .8)},${f(-H - h * .3)} ${f(x1)},${-H}" stroke="${lc}" stroke-width="${a.under === "ridges" ? 2.2 : 1}" fill="none" stroke-linecap="round"/>`;
+    }
+    o += `<path d="${cone}" fill="url(#shadeH)" opacity=".7"/>`;
+    // barret vist des de dalt
+    const ry = h * .24;
+    o += `<ellipse cx="0" cy="${-H - h}" rx="${w / 2}" ry="${ry}" fill="url(#${id}cap)"/>`;
+    o += `<ellipse cx="0" cy="${-H - h + ry * .15}" rx="${w * .3}" ry="${ry * .55}" fill="${a.capC}" opacity=".7"/>`;
+    if (a.pat === "zones") for (let k = 1; k <= 4; k++) o += `<ellipse cx="0" cy="${-H - h + k * .4}" rx="${w / 2 * k / 4.6}" ry="${ry * k / 4.6}" fill="none" stroke="${a.patC}" stroke-width="2.4" opacity=".55"/>`;
+    if (a.green) for (let k = 0; k < 4; k++) { const ang = r() * Math.PI * 2; o += `<ellipse cx="${f(Math.cos(ang) * w * .36)}" cy="${f(-H - h + Math.sin(ang) * ry * .7)}" rx="${f(5 + r() * 6)}" ry="${f(2 + r() * 2)}" fill="#6f8a4a" opacity=".55"/>`; }
+    if (a.hairs) for (let k = 0; k < 46; k++) { const ang = k / 46 * Math.PI * 2; const x = Math.cos(ang) * w / 2, y = -H - h + Math.sin(ang) * ry; o += `<line x1="${f(x)}" y1="${f(y)}" x2="${f(x * 1.06)}" y2="${f(y + Math.sin(ang) * 3 + 2)}" stroke="${a.hairs}" stroke-width="2" stroke-linecap="round"/>`; }
+    o += `<ellipse cx="${-w * .14}" cy="${-H - h - ry * .35}" rx="${w * .16}" ry="${ry * .25}" fill="#fff" opacity=".22"/>`;
+    return o;
+  }
+
+  const noUnder = ["ball", "morel", "brain", "bell"].includes(a.shape);
+  // làmines o porus
+  const urx = w * .47, ury = w * (a.shape === "umbrella" ? .065 : .085);
+  if (!noUnder) o += `<ellipse cx="0" cy="${-H}" rx="${urx}" ry="${ury}" fill="${a.underC}"/>`;
+  if (noUnder) {
+  } else if (a.under === "pores") {
+    for (let k = 0; k < 70; k++) { const ang = r() * Math.PI, rad = Math.sqrt(r()); o += `<circle cx="${f(Math.cos(ang) * urx * rad * .95)}" cy="${f(-H + Math.sin(ang) * ury * rad * .9)}" r="${f(1 + r() * 1.2)}" fill="${dark(a.underC, .22)}" opacity=".6"/>`; }
+  } else {
+    for (let k = 0; k <= 40; k++) { const ang = k / 40 * Math.PI; o += `<line x1="0" y1="${-H}" x2="${f(Math.cos(ang) * urx * .97)}" y2="${f(-H + Math.sin(ang) * ury * .95)}" stroke="${dark(a.underC, .14)}" stroke-width=".9"/>`; }
+  }
+  if (a.shape !== "ball") o += stemShapes(a, id, r);
+  // barret
+  o += `<g transform="translate(0,${-H})">`;
+  o += `<path d="${capPath(a.shape, w, h)}" fill="url(#${id}cap)"/>`;
+  o += `</g><g clip-path="url(#${id}cc)">` + capPattern(a, r, -H) + `</g>`;
+  o += `<g transform="translate(0,${-H})"><path d="${capPath(a.shape, w, h)}" fill="url(#shadeV)"/>`;
+  o += `<ellipse cx="${-w * .17}" cy="${-h * .62}" rx="${w * .14}" ry="${h * .14}" fill="#fff" opacity=".22" transform="rotate(-18 ${-w * .17} ${-h * .62})"/></g>`;
+  return o;
+}
+
+function stemShapes(a, id, r) {
+  const H = a.stemH, s = a.sw;
+  let o = `<path d="${stemPath(a)}" fill="url(#${id}st)"/>`;
+  let p = "";
+  if (a.stemPat === "net") {
+    for (let y = -H + 6; y < -4; y += 7) for (let x = -s; x < s; x += 8) {
+      const xo = x + ((y / 7) % 2 ? 4 : 0);
+      p += `<path d="M${f(xo)},${f(y)} l4,3.5 l-4,3.5 l-4,-3.5z" fill="none" stroke="${a.stemPatC}" stroke-width="1.1"/>`;
+    }
+  } else if (a.stemPat === "snake") {
+    for (let y = -H * .82; y < -s * .9; y += 13) p += `<path d="M${-s},${f(y)} l${s * .3},4 l${s * .3},-4 l${s * .3},4 l${s * .3},-4 l${s * .3},4 l${s * .3},-4 l${s * .3},4" fill="none" stroke="${a.stemPatC}" stroke-width="3" stroke-linejoin="round" opacity=".75"/>`;
+  } else if (a.stemPat === "bands") {
+    for (let y = -H * .55; y < -4; y += 10) p += `<path d="M${-s},${f(y)} q${s * .5},3 ${s},0 t${s},0" fill="none" stroke="${a.stemPatC}" stroke-width="2.6" opacity=".7"/>`;
+  } else if (a.stemPat === "pits") {
+    for (let k = 0; k < 6; k++) p += `<ellipse cx="${f((r() - .5) * s * .7)}" cy="${f(-H * (.15 + r() * .7))}" rx="${f(3 + r() * 3)}" ry="${f(2 + r() * 2)}" fill="${a.stemPatC}" opacity=".6"/>`;
+  }
+  if (p) o += `<g clip-path="url(#${id}sc)">${p}</g>`;
+  o += `<path d="${stemPath(a)}" fill="url(#shadeH)"/>`;
+  // volva
+  if (a.volva === "sac") {
+    const y0 = -s * 1.05;
+    o += `<path d="M${-s * .85},${f(y0 + 4)} L${-s * .6},${f(y0 - 6)} L${-s * .35},${f(y0 + 3)} L${-s * .05},${f(y0 - 8)} L${s * .25},${f(y0 + 2)} L${s * .55},${f(y0 - 5)} L${s * .88},${f(y0 + 5)} C${s * 1.05},${f(-s * .4)} ${s * .9},0 ${s * .6},${f(s * .1)} Q0,${f(s * .3)} ${-s * .6},${f(s * .1)} C${-s * .95},0 ${-s * 1.05},${f(-s * .4)} ${-s * .85},${f(y0 + 4)}Z" fill="${a.volvaC}" stroke="${dark(a.volvaC, .14)}" stroke-width="1.4"/>`;
+  } else if (a.volva === "collar") {
+    for (let k = 0; k < 3; k++) { const y = -s * (.35 + k * .28); o += `<path d="M${f(-s * (.82 - k * .1))},${f(y)} Q0,${f(y + 6)} ${f(s * (.82 - k * .1))},${f(y)}" fill="none" stroke="#fffaf0" stroke-width="3.2" stroke-dasharray="4 3" stroke-linecap="round"/>`; }
+  }
+  // anell
+  if (a.ring) {
+    const y = -H * (a.ringType === "collar" ? .7 : .8);
+    if (a.ringType === "collar") {
+      o += `<path d="M${-s * .9},${f(y)} Q0,${f(y - 5)} ${s * .9},${f(y)} L${s * .95},${f(y + 9)} Q0,${f(y + 14)} ${-s * .95},${f(y + 9)}Z" fill="${a.ring}" stroke="${dark(a.ring, .2)}" stroke-width="1.2"/>`;
+    } else {
+      const k = a.ringSmall ? .65 : 1;
+      o += `<path d="M${-s * .5},${f(y)} Q${-s * .95 * k - s * .1},${f(y + s * .5 * k)} ${-s * .7 * k - s * .1},${f(y + s * .75 * k)} Q0,${f(y + s * .95 * k)} ${s * .7 * k + s * .1},${f(y + s * .75 * k)} Q${s * .95 * k + s * .1},${f(y + s * .5 * k)} ${s * .5},${f(y)}Z" fill="${a.ring}" stroke="${dark(a.ring, .14)}" stroke-width="1.2"/>`;
+      o += `<path d="M${-s * .5},${f(y)} Q${-s * .95 * k - s * .1},${f(y + s * .5 * k)} ${-s * .7 * k - s * .1},${f(y + s * .75 * k)} Q0,${f(y + s * .95 * k)} ${s * .7 * k + s * .1},${f(y + s * .75 * k)} Q${s * .95 * k + s * .1},${f(y + s * .5 * k)} ${s * .5},${f(y)}Z" fill="url(#shadeH)"/>`;
+    }
+  }
+  return o;
+}
+
+function capPattern(a, r, oy) {
+  const w = a.w, h = a.h;
+  let o = "";
+  const pt = () => { const x = (r() - .5) * w, y = oy - r() * h * 1.05; return [x, y]; };
+  switch (a.pat) {
+    case "warts":
+      for (let k = 0; k < 34; k++) { const [x, y] = pt(); const rr = 2.5 + r() * 4.5; o += `<ellipse cx="${f(x)}" cy="${f(y)}" rx="${f(rr)}" ry="${f(rr * .8)}" fill="${a.patC}" opacity=".95"/>`; }
+      break;
+    case "scales":
+      o += `<ellipse cx="0" cy="${f(oy - h * .9)}" rx="${f(w * .12)}" ry="${f(h * .18)}" fill="${a.capC}"/>`;
+      for (let k = 0; k < 60; k++) { const [x, y] = pt(); const d = 1 - Math.min(1, Math.abs(x) / (w / 2)); const rr = 2 + d * 4; o += `<path d="M${f(x - rr)},${f(y)} q${f(rr)},${f(-rr * 1.3)} ${f(rr * 2)},0 q${f(-rr)},${f(rr * .5)} ${f(-rr * 2)},0z" fill="${a.patC}" opacity="${f(.45 + d * .5)}"/>`; }
+      break;
+    case "striate":
+      for (let k = 0; k < 40; k++) { const t = k / 39 - .5, x = t * w * .98; o += `<line x1="${f(x)}" y1="${f(oy + 1)}" x2="${f(x * .93)}" y2="${f(oy - h * .22)}" stroke="${a.patC}" stroke-width="1.3" opacity=".75"/>`; }
+      break;
+    case "fibrils":
+      for (let k = 0; k < 48; k++) { const t = k / 47 - .5; o += `<path d="M0,${f(oy - h)} Q${f(t * w * .6)},${f(oy - h * .7)} ${f(t * w)},${f(oy + 2)}" fill="none" stroke="${a.patC}" stroke-width=".9" opacity=".45"/>`; }
+      break;
+    case "cracks":
+      o += `<rect x="${-w / 2}" y="${oy - h - 4}" width="${w}" height="${h + 8}" fill="${a.patC}" opacity=".9"/>`;
+      for (let y = oy - h; y < oy + 4; y += 9) for (let x = -w / 2; x < w / 2; x += 11) {
+        const big = (oy - y) > h * .55 ? 1 : 0;
+        const jx = (r() - .5) * 3, jy = (r() - .5) * 2;
+        o += `<rect x="${f(x + jx + (big ? 0 : 1.5))}" y="${f(y + jy + (big ? 0 : 1.2))}" width="${big ? 11 : 8}" height="${big ? 9 : 6.6}" rx="2.5" fill="${(oy - y) > h * .55 ? a.capC : a.cap}"/>`;
+      }
+      break;
+    case "felt":
+      for (let k = 0; k < 120; k++) { const [x, y] = pt(); o += `<line x1="${f(x)}" y1="${f(y)}" x2="${f(x + (r() - .5) * 4)}" y2="${f(y + 2 + r() * 2)}" stroke="${a.patC}" stroke-width="1.1" opacity=".55"/>`; }
+      break;
+    case "spines":
+      for (let k = 0; k < 70; k++) { const [x, y] = pt(); const rr = 1.2 + r() * 2.2; o += `<circle cx="${f(x)}" cy="${f(y)}" r="${f(rr)}" fill="${a.patC}"/><circle cx="${f(x - rr * .3)}" cy="${f(y - rr * .3)}" r="${f(rr * .45)}" fill="#fffaf0" opacity=".8"/>`; }
+      break;
+    case "honeycomb":
+      for (let y = oy - h; y < oy + 4; y += 13) for (let x = -w / 2; x < w / 2; x += 12) {
+        const jx = (r() - .5) * 4, jy = (r() - .5) * 3, xo = x + (Math.round((y - oy) / 13) % 2 ? 6 : 0);
+        o += `<ellipse cx="${f(xo + jx)}" cy="${f(y + jy)}" rx="${f(3.6 + r() * 1.4)}" ry="${f(4.8 + r() * 1.6)}" fill="${a.patC}" opacity=".85"/>`;
+      }
+      break;
+    case "folds":
+      for (let k = 0; k < 16; k++) { const [x, y] = pt(); o += `<path d="M${f(x - 12)},${f(y)} q6,${f(-8 + r() * 4)} 12,0 t12,${f((r() - .5) * 6)} t10,${f((r() - .5) * 6)}" fill="none" stroke="${a.patC}" stroke-width="2.6" stroke-linecap="round" opacity=".7"/>`; }
+      o += `<ellipse cx="${f(-w * .15)}" cy="${f(oy - h * .7)}" rx="${f(w * .14)}" ry="${f(h * .1)}" fill="#fff" opacity=".12"/>`;
+      break;
+    case "shaggy":
+      for (let y = oy - h * .9; y < oy - 6; y += 11) for (let x = -w / 2 + 4; x < w / 2; x += 10) {
+        const xo = x + (Math.round(y / 11) % 2 ? 5 : 0) + (r() - .5) * 3;
+        o += `<path d="M${f(xo - 4)},${f(y)} q4,-7 8,0 q-4,3 -8,0z" fill="${a.patC}" opacity=".75"/>`;
+      }
+      break;
+    case "ribs":
+      for (let k = 0; k < 16; k++) { const t = k / 15 - .5; o += `<line x1="${f(t * w * .5)}" y1="${f(oy - h * .95)}" x2="${f(t * w)}" y2="${f(oy + 2)}" stroke="${a.patC}" stroke-width="1.4" opacity=".6"/>`; }
+      break;
+    case "gloss":
+      o += `<ellipse cx="${f(w * .12)}" cy="${f(oy - h * .7)}" rx="${f(w * .22)}" ry="${f(h * .12)}" fill="#fff" opacity=".28" transform="rotate(12 ${f(w * .12)} ${f(oy - h * .7)})"/>`;
+      break;
+    case "stain":
+      o += `<ellipse cx="${f(w * .32)}" cy="${f(oy - h * .12)}" rx="${f(w * .2)}" ry="${f(h * .2)}" fill="${a.patC}" opacity=".75"/>`;
+      o += `<ellipse cx="${f(-w * .36)}" cy="${f(oy - h * .05)}" rx="${f(w * .09)}" ry="${f(h * .1)}" fill="${a.patC}" opacity=".5"/>`;
+      break;
+  }
+  if (a.ink) o += `<rect x="${-w / 2 - 2}" y="${f(oy - h * .16)}" width="${w + 4}" height="${f(h * .2)}" fill="#1c1814" opacity=".85"/><rect x="${-w / 2 - 2}" y="${f(oy - h * .26)}" width="${w + 4}" height="${f(h * .1)}" fill="#3a332c" opacity=".45"/>`;
+  if (a.striate && a.pat !== "striate") for (let k = 0; k < 40; k++) { const t = k / 39 - .5, x = t * w * .98; o += `<line x1="${f(x)}" y1="${f(oy + 1)}" x2="${f(x * .93)}" y2="${f(oy - h * .2)}" stroke="${a.striate}" stroke-width="1.2" opacity=".6"/>`; }
+  return o;
+}
+
+function shelf(a, id) {
+  let o = `<defs><radialGradient id="${id}cap" cx=".1" cy=".5" r="1"><stop offset="0" stop-color="${a.capC}"/><stop offset=".8" stop-color="${a.cap}"/><stop offset="1" stop-color="${light(a.cap, .15)}"/></radialGradient></defs>`;
+  const fans = [[150, 60, 1], [150, 150, .9], [150, 228, .74]];
+  for (const [x, y, s] of fans) {
+    o += `<g transform="translate(${x},${y}) scale(${s})">`;
+    o += `<path d="M0,8 C40,14 90,22 130,16 C112,34 50,34 0,16Z" fill="${a.underC}"/>`;
+    for (let k = 1; k < 14; k++) { const t = k / 14; o += `<line x1="0" y1="12" x2="${f(130 * t)}" y2="${f(16 + Math.sin(t * Math.PI) * 13)}" stroke="${dark(a.underC, .14)}" stroke-width="1"/>`; }
+    o += `<path d="M0,-6 C40,-50 120,-55 150,-20 C160,-5 150,12 130,16 C90,22 40,14 0,8Z" fill="url(#${id}cap)"/>`;
+    o += `<path d="M20,-14 C50,-38 100,-42 128,-24" fill="none" stroke="#fff" stroke-width="5" opacity=".18" stroke-linecap="round"/>`;
+    o += `</g>`;
+  }
+  return o;
+}
+
+const G = 288;
+function scene(b, uid) {
+  const a = b.art, r = rng(hash(b.id));
+  const id = "s" + uid;
+  let back = "", front = "";
+  // fons
+  let o = `<defs>
+    <linearGradient id="${id}sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6e6c4"/><stop offset="1" stop-color="#e3c792"/></linearGradient>
+    <linearGradient id="shadeH" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#000" stop-opacity=".2"/><stop offset=".32" stop-color="#fff" stop-opacity=".14"/><stop offset=".7" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".24"/></linearGradient>
+    <linearGradient id="shadeV" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset=".65" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".2"/></linearGradient>
+  </defs>`;
+  o += `<rect y="-110" width="400" height="460" fill="url(#${id}sky)"/>`;
+  for (let k = 0; k < 5; k++) { const x = 20 + r() * 360, wd = 14 + r() * 26; o += `<rect x="${f(x)}" y="-120" width="${f(wd)}" height="${G + 120}" rx="${f(wd / 2)}" fill="#7a5a3a" opacity="${f(.06 + r() * .07)}"/>`; }
+  o += `<polygon points="280,-110 335,-110 180,${G} 110,${G}" fill="#fff" opacity=".13"/><polygon points="355,-110 380,-110 260,${G} 225,${G}" fill="#fff" opacity=".1"/>`;
+
+  const groundC = { pine: "#a8703c", oak: "#8f6a3e", grass: "#7f9a4a", log: "#86704a", trunk: "#86704a" }[a.sub];
+  o += `<rect x="-20" y="${G + 26}" width="440" height="120" fill="${dark(groundC, .12)}"/>`;
+  o += `<ellipse cx="200" cy="${G + 26}" rx="215" ry="48" fill="${groundC}"/>`;
+  o += `<ellipse cx="200" cy="${G + 26}" rx="215" ry="48" fill="url(#shadeV)"/>`;
+  const inGround = () => { let x, y; do { x = 200 + (r() - .5) * 400; y = G + 26 + (r() - .5) * 90; } while (((x - 200) / 205) ** 2 + ((y - G - 26) / 44) ** 2 > .9); return [x, y]; };
+
+  if (a.sub === "pine") {
+    for (let k = 0; k < 90; k++) { const [x, y] = inGround(); const ang = r() * Math.PI, l = 12 + r() * 16; o += `<line x1="${f(x)}" y1="${f(y)}" x2="${f(x + Math.cos(ang) * l)}" y2="${f(y + Math.sin(ang) * l * .4)}" stroke="${["#c88a4c", "#9b6532", "#b9773d", "#7e5228"][k % 4]}" stroke-width="1.7" stroke-linecap="round"/>`; }
+    front += `<g transform="translate(318,${G + 18}) rotate(-24)"><ellipse rx="19" ry="12" fill="#6e4424"/>${[-12, -6, 0, 6, 12].map(x => `<path d="M${x},-10 q4,10 0,20" stroke="#4e2e16" fill="none" stroke-width="1.6"/>`).join("")}</g>`;
+  }
+  if (a.sub === "oak") {
+    for (let k = 0; k < 16; k++) { const [x, y] = inGround(); const c = ["#c7922f", "#a8662a", "#d4a443", "#8a5a2a"][k % 4]; o += `<g transform="translate(${f(x)},${f(y)}) rotate(${f(r() * 360)}) scale(${f(.9 + r() * .6)},${f(.45 + r() * .2)})"><path d="M0,-14C8,-10 10,-2 7,4C9,8 5,14 0,16C-5,14-9,8-7,4C-10,-2-8,-10 0,-14Z" fill="${c}"/><line x1="0" y1="-12" x2="0" y2="15" stroke="${dark(c, .25)}" stroke-width="1"/></g>`; }
+    front += `<g transform="translate(92,${G + 22}) rotate(-30)"><ellipse cy="5" rx="7" ry="10" fill="#9a6a2c"/><path d="M-9,-1 Q0,-10 9,-1 Q0,3 -9,-1Z" fill="#6a4a24"/><line x1="0" y1="-7" x2="1" y2="-12" stroke="#6a4a24" stroke-width="2"/></g>`;
+  }
+  if (a.sub === "grass") {
+    for (let k = 0; k < 45; k++) { const x = 20 + r() * 360, y = G + 4 + r() * 12, hh = 16 + r() * 26, bd = (r() - .5) * 14; back += `<path d="M${f(x)},${f(y)} Q${f(x + bd)},${f(y - hh / 2)} ${f(x + bd * 1.6)},${f(y - hh)}" stroke="${["#6f8f3a", "#89a84a", "#5a7a30"][k % 3]}" stroke-width="2.6" fill="none" stroke-linecap="round"/>`; }
+    for (let k = 0; k < 22; k++) { const x = 10 + r() * 380, y = G + 30 + r() * 20, hh = 14 + r() * 22, bd = (r() - .5) * 14; front += `<path d="M${f(x)},${f(y)} Q${f(x + bd)},${f(y - hh / 2)} ${f(x + bd * 1.6)},${f(y - hh)}" stroke="${["#7f9f3f", "#9ab856", "#62822f"][k % 3]}" stroke-width="2.8" fill="none" stroke-linecap="round"/>`; }
+  }
+  if (a.sub === "log") {
+    o += `<rect x="30" y="${G - 8}" width="330" height="50" rx="25" fill="#7a5634"/>`;
+    for (let k = 0; k < 6; k++) o += `<path d="M${50 + k * 8},${G + 2 + k * 6} q60,${f((r() - .5) * 6)} 120,0 t120,0" stroke="#5e4026" stroke-width="2" fill="none" opacity=".7"/>`;
+    o += `<ellipse cx="360" cy="${G + 17}" rx="15" ry="25" fill="#c79a63"/><ellipse cx="360" cy="${G + 17}" rx="9" ry="15" fill="none" stroke="#a87a48" stroke-width="2"/><ellipse cx="360" cy="${G + 17}" rx="4" ry="7" fill="none" stroke="#a87a48" stroke-width="2"/>`;
+    for (let k = 0; k < 10; k++) o += `<circle cx="${f(60 + r() * 260)}" cy="${f(G - 6 + r() * 4)}" r="${f(4 + r() * 5)}" fill="#6f8a3a"/>`;
+  }
+  if (a.sub === "trunk") {
+    o += `<path d="M58,-110 L150,-110 L156,${G + 10} Q104,${G + 30} 50,${G + 10}Z" fill="#6e4e33"/>`;
+    for (let k = 0; k < 7; k++) o += `<path d="M${70 + k * 12},-110 q${f((r() - .5) * 10)},${G / 2 + 55} 0,${G + 110}" stroke="#4f3522" stroke-width="2.4" fill="none" opacity=".7"/>`;
+    for (let k = 0; k < 8; k++) o += `<circle cx="${f(60 + r() * 90)}" cy="${f(G + r() * 14)}" r="${f(5 + r() * 6)}" fill="#6f8a3a"/>`;
+  }
+  // moss
+  if (a.sub !== "trunk") for (let k = 0; k < 3; k++) { const [x, y] = inGround(); for (let j = 0; j < 5; j++) o += `<circle cx="${f(x + (r() - .5) * 18)}" cy="${f(y + (r() - .5) * 6)}" r="${f(3 + r() * 4)}" fill="${["#6f8a3a", "#7f9c44", "#5c7630"][j % 3]}"/>`; }
+
+  o += back;
+  if (a.shape === "shelf") {
+    o += shelf(a, id);
+  } else {
+    const baseY = a.sub === "log" ? G - 4 : G + 8;
+    const sc = a.scale || 1;
+    const spots = a.count === 3 ? [[-92, .62, -9], [96, .72, 8], [0, 1, 0]] : a.count === 2 ? [[-88, .7, -8], [10, 1, 2]] : [[0, 1, 0]];
+    for (let i = 0; i < spots.length; i++) {
+      const [dx, s, t] = spots[i];
+      o += `<ellipse cx="${200 + dx}" cy="${baseY + 2}" rx="${f(a.sw * 1.2 * s * sc + 14)}" ry="${f(6 + 4 * s)}" fill="#2a1a0c" opacity=".25"/>`;
+      o += `<g transform="translate(${200 + dx},${baseY}) scale(${f(s * sc)}) rotate(${t})">${shroom(a, id + "m" + i, r)}</g>`;
+    }
+  }
+  o += front;
+  return `<svg class="scene" viewBox="0 -50 400 430" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Il·lustració d'un bolet">${o}</svg>`;
+}
+
+/* ------------------ Fons del bosc ------------------ */
+function drawBg() {
+  const c = document.getElementById("bg"), d = window.devicePixelRatio || 1;
+  c.width = innerWidth * d; c.height = innerHeight * d;
+  const x = c.getContext("2d"); x.scale(d, d);
+  const g = x.createRadialGradient(innerWidth / 2, innerHeight * .35, 20, innerWidth / 2, innerHeight * .4, Math.max(innerWidth, innerHeight) * .8);
+  g.addColorStop(0, "#2f4224"); g.addColorStop(1, "#151d12");
+  x.fillStyle = g; x.fillRect(0, 0, innerWidth, innerHeight);
+  const r = rng(7);
+  const cols = ["#3c5a2e", "#5a4526", "#7a5a2e", "#4a6a34", "#6e3f1e"];
+  for (let k = 0; k < Math.round(innerWidth * innerHeight / 3500); k++) {
+    x.save();
+    x.translate(r() * innerWidth, r() * innerHeight);
+    x.rotate(r() * Math.PI * 2);
+    x.globalAlpha = .18 + r() * .22;
+    x.fillStyle = x.strokeStyle = cols[k % cols.length];
+    if (k % 3 === 0) { x.lineWidth = 1.6; x.beginPath(); x.moveTo(0, 0); x.lineTo(14 + r() * 14, 0); x.stroke(); }
+    else { const s = 6 + r() * 9; x.beginPath(); x.ellipse(0, 0, s, s * .45, 0, 0, Math.PI * 2); x.fill(); }
+    x.restore();
+  }
+}
+
+/* ------------------ Joc ------------------ */
+const $ = s => document.getElementById(s);
+const BASKET = `<svg viewBox="0 0 32 28" aria-hidden="true"><path d="M7 12Q16-3 25 12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M3 11h26l-3.5 14h-19z" fill="currentColor"/></svg>`;
+let st;
+
+function newDeck(prev) {
+  // barreja tots els bolets; evita repetir l'últim just en enllaçar baralles
+  let d = shuffle(BOLETS);
+  if (prev && d[0] === prev) d.push(d.shift());
+  return d;
+}
+
+/* sons sintetitzats, sense fitxers */
+let ac;
+function beep(ok) {
+  try {
+    ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+    const o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime;
+    o.type = ok ? "triangle" : "sawtooth";
+    o.frequency.setValueAtTime(ok ? 520 : 180, t);
+    o.frequency.exponentialRampToValueAtTime(ok ? 880 : 110, t + .14);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(ok ? .18 : .12, t + .02); g.gain.exponentialRampToValueAtTime(.0001, t + .22);
+    o.connect(g).connect(ac.destination); o.start(t); o.stop(t + .25);
+  } catch (e) {}
+  if (!ok) try { navigator.vibrate && navigator.vibrate(120); } catch (e) {}
+}
+
+function judge(b, choice) {
+  // retorna {ok, life, verdict, over}
+  const edible = b.cat === "comestible";
+  if (choice === "cistella") {
+    if (edible) return { ok: true, life: 0, verdict: "A la cistella!" };
+    if (b.cat === "nocomestible") return { ok: false, life: 0, verdict: "Sopar amarg" };
+    if (b.cat === "toxic") return { ok: false, life: -1, verdict: "Mal de panxa" };
+    return { ok: false, life: -99, verdict: "Cistella enverinada", over: true };
+  }
+  if (edible) return { ok: false, life: 0, verdict: "S'ha quedat al bosc" };
+  if (b.cat === "mortal") return { ok: true, life: 0, verdict: "Ben fet, t'has salvat" };
+  return { ok: true, life: 0, verdict: b.cat === "toxic" ? "Bona decisió" : "Ben vist" };
+}
+
+function start() {
+  st = { deck: newDeck(), i: 0, n: 0, lives: 3, score: 0, streak: 0, best: 0, hits: 0, seenMortal: [], busy: false, dead: false, timer: 0 };
+  $("start").hidden = true; $("end").hidden = true;
+  renderHud(); renderCards();
+}
+
+function renderHud() {
+  $("lives").innerHTML = [0, 1, 2].map(k => BASKET.replace("<svg", `<svg class="${k < st.lives ? "" : "lost"}"`)).join("");
+  $("score").textContent = st.score;
+  const mult = 1 + Math.floor(st.streak / 3);
+  $("count").textContent = st.streak ? `ratxa ${st.streak} · x${mult}` : "punts";
+  $("prog").style.width = ((st.streak % 3) / 3 * 100) + "%";
+}
+
+function cardHTML(b, n) {
+  return `<div class="stamp yes">CISTELLA</div><div class="stamp no">AL BOSC</div>
+    ${b.foto ? `<img class="scene" src="${b.foto}" alt="Foto d'un bolet" draggable="false">` : scene(b, n)}
+    <div class="info">
+      <div class="hint">${b.pistes.map(p => `<span class="chip">${p}</span>`).join("")}</div>
+      ${b.foto ? `<div class="credit">Foto: ${b.credit}</div>` : ""}
+      ${st.n === 0 ? `<div class="tuto">Arrossega la targeta o fes servir els botons.</div>` : ""}
+    </div>`;
+}
+
+function renderCards() {
+  const stage = $("stage");
+  stage.innerHTML = "";
+  if (st.i + 1 >= st.deck.length) st.deck = st.deck.concat(newDeck(st.deck[st.deck.length - 1]));
+  const nxt = st.deck[st.i + 1];
+  if (nxt) { const c2 = document.createElement("div"); c2.className = "card back"; c2.innerHTML = cardHTML(nxt, st.i + 1); c2.setAttribute("aria-hidden", "true"); stage.appendChild(c2); }
+  const b = st.deck[st.i];
+  const c = document.createElement("div");
+  c.className = "card"; c.innerHTML = cardHTML(b, st.i);
+  stage.appendChild(c);
+  bindDrag(c);
+  $("btnNo").disabled = $("btnYes").disabled = false;
+  st.busy = false;
+}
+
+function bindDrag(card) {
+  let x0 = 0, y0 = 0, dx = 0, dragging = false;
+  const yes = card.querySelector(".stamp.yes"), no = card.querySelector(".stamp.no");
+  card.addEventListener("pointerdown", e => { if (st.busy) return; dragging = true; x0 = e.clientX; y0 = e.clientY; dx = 0; card.classList.remove("anim"); card.setPointerCapture(e.pointerId); });
+  card.addEventListener("pointermove", e => {
+    if (!dragging) return;
+    dx = e.clientX - x0; const dy = (e.clientY - y0) * .3;
+    card.style.transform = `translate(${dx}px,${dy}px) rotate(${dx / 18}deg)`;
+    yes.style.opacity = Math.max(0, Math.min(1, dx / 100));
+    no.style.opacity = Math.max(0, Math.min(1, -dx / 100));
+  });
+  const up = () => {
+    if (!dragging) return; dragging = false;
+    if (Math.abs(dx) > 100) commit(dx > 0 ? "cistella" : "bosc");
+    else { card.classList.add("anim"); card.style.transform = ""; yes.style.opacity = no.style.opacity = 0; }
+  };
+  card.addEventListener("pointerup", up);
+  card.addEventListener("pointercancel", up);
+}
+
+function commit(choice) {
+  if (st.busy || st.dead) return;
+  st.busy = true;
+  $("btnNo").disabled = $("btnYes").disabled = true;
+  const card = $("stage").querySelector(".card:not(.back)");
+  const dir = choice === "cistella" ? 1 : -1;
+  card.querySelector(choice === "cistella" ? ".stamp.yes" : ".stamp.no").style.opacity = 1;
+  card.classList.add("anim");
+  card.style.transform = `translate(${dir * 520}px, 40px) rotate(${dir * 24}deg)`;
+  card.style.opacity = "0";
+  const back = $("stage").querySelector(".card.back");
+  if (back) { back.classList.add("anim"); back.classList.remove("back"); }
+
+  const b = st.deck[st.i];
+  const res = judge(b, choice);
+  st.lastMortal = !!res.over;
+  let gained = 0;
+  st.n++;
+  if (res.ok) { const mult = 1 + Math.floor(st.streak / 3); st.streak++; st.hits++; st.best = Math.max(st.best, st.streak); gained = 10 * mult; st.score += gained; }
+  else st.streak = 0;
+  beep(res.ok);
+  st.lives = Math.max(0, st.lives + res.life);
+  if (b.cat === "mortal" && !st.seenMortal.includes(b.id)) st.seenMortal.push(b.id);
+  if (st.lives === 0) st.dead = true;
+  renderHud();
+  const serious = !res.ok && (b.cat === "toxic" || b.cat === "mortal");
+  setTimeout(() => serious ? showSheet(b, res, gained) : showFlash(b, res, gained), 200);
+}
+
+function showFlash(b, res, gained) {
+  const c = CAT[b.cat];
+  const fl = $("flash");
+  fl.innerHTML = `
+    <div class="v" style="color:${res.ok ? "#9fd36a" : "#f0b45a"}">${res.ok ? `+${gained}` : res.verdict}</div>
+    <div class="n"><b>${b.nom}</b>${b.nom !== b.sci ? `<i>${b.sci}</i>` : ""}<span class="badge" style="background:${c.color}">${c.label}</span></div>
+    <div class="timer"><i></i></div>
+    <button class="why" id="btnWhy">Per què?</button>`;
+  void fl.offsetWidth;
+  fl.classList.add("show");
+  st.timer = setTimeout(() => { fl.classList.remove("show"); next(); }, 1600);
+  $("btnWhy").onclick = () => { clearTimeout(st.timer); fl.classList.remove("show"); showSheet(b, res, gained); };
+}
+
+function showSheet(b, res, gained) {
+  const c = CAT[b.cat];
+  const sub = !res.ok && b.cat === "comestible" ? "Prudent, però t'has perdut un bon sopar."
+    : res.life === -1 ? "Perds una cistella."
+    : res.over ? "Un sol error així pot ser mortal. Fi de la jornada."
+    : !res.ok && b.cat === "nocomestible" ? "No et farà mal, però amarga com el fel." : "";
+  const conf = b.conf.map(k => BY_ID[k]).filter(Boolean);
+  const stripe = res.ok ? "var(--ok)" : c.color;
+  $("sheet").innerHTML = `
+    <div class="stripe" style="background:${stripe}"></div>
+    <div class="verdict" style="color:${res.ok ? "var(--ok)" : c.color}">${res.verdict}</div>
+    <div class="pts">${res.ok ? `+${gained} punts${st.streak >= 3 ? ` · ratxa de ${st.streak}` : ""}` : sub}</div>
+    <div class="name"><b>${b.nom}</b>${b.nom !== b.sci ? `<i>${b.sci}</i>` : ""}<span class="badge" style="background:${c.color}">${c.label}</span></div>
+    <p>${b.text}</p>
+    ${conf.length ? `<div class="confusio">Es confon amb: ${conf.map(x => (x.cat === "mortal" || x.cat === "toxic") ? `<b>${x.nom}</b> (${CAT[x.cat].label.toLowerCase()})` : `${x.nom} (${CAT[x.cat].label.toLowerCase()})`).join(", ")}</div>` : ""}
+    ${b.foto ? `<div class="src">Foto: ${b.credit} · <a href="${b.url}" target="_blank" rel="noopener">${b.font || "iNaturalist"}</a></div>` : ""}
+    <button class="next" id="btnNext">${st.dead ? "Veure el resultat" : "Següent bolet"}</button>`;
+  $("sheet").classList.add("open");
+  $("btnNext").focus({ preventScroll: true });
+  $("btnNext").onclick = next;
+}
+
+function next() {
+  $("sheet").classList.remove("open");
+  st.i++;
+  if (st.dead) return end();
+  renderHud(); renderCards();
+}
+
+function end() {
+  let best = st.score;
+  try { best = Math.max(best, +localStorage.getItem("cistella-best") || 0); localStorage.setItem("cistella-best", best); } catch (e) {}
+  const killed = st.deck[st.i - 1] && st.deck[st.i - 1].cat === "mortal" && st.lastMortal;
+  $("endTitle").textContent = killed ? "Intoxicació!" : "Sense cistelles";
+  $("endText").textContent = killed
+    ? "Has posat a la cistella un bolet mortal. Al bosc, quan dubtis, deixa'l on és."
+    : `Has fet ${st.hits} encerts de ${st.n} bolets, amb una ratxa màxima de ${st.best}.`;
+  $("stScore").textContent = st.score;
+  $("stHits").textContent = `${st.hits}/${st.n}`;
+  $("stBest").textContent = best;
+  $("mortalWrap").hidden = !st.seenMortal.length;
+  $("mortalList").innerHTML = st.seenMortal.map(k => `<span class="chip">${BY_ID[k].nom}</span>`).join("");
+  $("end").hidden = false;
+}
+
+/* ------------------ Arrencada ------------------ */
+$("hero").innerHTML = (() => {
+  const picks = ["cep", "reigbord", "rovello"].map(k => BY_ID[k]);
+  const inner = picks.map((b, i) => {
+    const a = b.art, s = [.62, .78, .6][i], x = [95, 200, 305][i], r = rng(hash(b.id));
+    return `<ellipse cx="${x}" cy="${G + 6}" rx="${a.sw * s + 22}" ry="7" fill="#000" opacity=".3"/><g transform="translate(${x},${G + 4}) scale(${s})">${shroom(a, "h" + i, r)}</g>`;
+  }).join("");
+  return `<svg viewBox="0 120 400 190" width="100%" aria-hidden="true"><defs>
+    <linearGradient id="shadeH" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#000" stop-opacity=".2"/><stop offset=".32" stop-color="#fff" stop-opacity=".14"/><stop offset=".7" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".24"/></linearGradient>
+    <linearGradient id="shadeV" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset=".65" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".2"/></linearGradient></defs>
+    <ellipse cx="200" cy="${G + 10}" rx="190" ry="20" fill="#36502a"/>${inner}</svg>`;
+})();
+$("btnStart").onclick = start;
+$("btnAgain").onclick = start;
+$("btnNo").onclick = () => commit("bosc");
+$("btnYes").onclick = () => commit("cistella");
+document.addEventListener("keydown", e => {
+  if (!st || !$("start").hidden || !$("end").hidden || !$("credits").hidden) return;
+  if ($("sheet").classList.contains("open") || $("flash").classList.contains("show")) return;
+  if (e.key === "ArrowRight") commit("cistella");
+  if (e.key === "ArrowLeft") commit("bosc");
+});
+drawBg();
+addEventListener("resize", drawBg);
+/* Fotos reals: si hi ha un fotos.json al costat (generat amb tria_fotos.py), substitueixen les il·lustracions */
+function nomAutor(v) {
+  const c = v.credit || "";
+  if (/no rights reserved/i.test(c) || /^(cc0|public domain)/i.test(v.llicencia || "")) return "Domini públic";
+  let m = c.match(/^\(c\)\s*(.+?),\s*(some|all) rights reserved/i);
+  if (m) return m[1];
+  m = c.match(/^(.+?)\s*\((CC|Public)/);
+  return m ? m[1] : c;
+}
+function llicencia(v) {
+  const l = (v.llicencia || "").toUpperCase().replace(/-/g, " ").trim();
+  if (l.startsWith("CC0")) return { nom: "CC0", url: "https://creativecommons.org/publicdomain/zero/1.0/deed.ca" };
+  if (l.includes("PUBLIC")) return { nom: "Domini públic", url: "" };
+  const ver = (l.match(/(\d\.\d)/) || [, "4.0"])[1];
+  const sa = l.includes("SA");
+  return { nom: `CC BY${sa ? "-SA" : ""} ${ver}`, url: `https://creativecommons.org/licenses/by${sa ? "-sa" : ""}/${ver}/deed.ca` };
+}
+fetch("fotos.json").then(r => r.ok ? r.json() : {}).then(j => {
+  for (const [id, v] of Object.entries(j)) if (BY_ID[id]) {
+    const lic = llicencia(v), autor = nomAutor(v);
+    Object.assign(BY_ID[id], { foto: v.foto, url: v.url, font: v.font || "iNaturalist", lic,
+      autor, credit: autor === "Domini públic" ? "domini públic (CC0)" : `${autor} · ${lic.nom}` });
+  }
+}).catch(() => {});
+
+function showCredits() {
+  const fotos = BOLETS.filter(b => b.foto);
+  $("clist").innerHTML = fotos.length
+    ? fotos.map(b => `<li><b>${b.nom}</b> <span class="who">· ${b.autor}</span><br>
+        ${b.lic.url ? `<a href="${b.lic.url}" target="_blank" rel="noopener">${b.lic.nom}</a>` : b.lic.nom}
+        · <a href="${b.url}" target="_blank" rel="noopener">foto original a ${b.font}</a></li>`).join("")
+      + (fotos.length < BOLETS.length ? `<li>Els bolets sense foto es mostren amb il·lustracions pròpies del joc.</li>` : "")
+    : `<li>Totes les imatges d'aquesta versió són il·lustracions pròpies del joc.</li>`;
+  $("credits").hidden = false;
+  $("credits").scrollTop = 0;
+}
+$("btnCred1").onclick = showCredits;
+$("btnCred2").onclick = showCredits;
+$("btnCredClose").onclick = () => { $("credits").hidden = true; };
+</script>
+</body>
+</html>

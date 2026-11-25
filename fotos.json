@@ -1,0 +1,310 @@
+{
+ "rovello": {
+  "foto": "fotos/rovello_2.jpg",
+  "credit": "(c) victor laborde, some rights reserved (CC BY)",
+  "llicencia": "CC-BY",
+  "url": "https://www.inaturalist.org/observations/413969979",
+  "font": "iNaturalist"
+ },
+ "torminosus": {
+  "foto": "fotos/torminosus_6.jpg",
+  "credit": "(c) Davide Puddu, some rights reserved (CC BY)",
+  "llicencia": "CC-BY",
+  "url": "https://www.inaturalist.org/observations/19060576",
+  "font": "iNaturalist"
+ },
+ "cep": {
+  "foto": "fotos/cep_1.jpg",
+  "credit": "(c) Rafael Medina, some rights reserved (CC BY)",
+  "llicencia": "CC-BY",
+  "url": "https://www.inaturalist.org/observations/62402241",
+  "font": "iNaturalist"
+ },
+ "mataparent": {
+  "foto": "fotos/mataparent_1.jpg",
+  "credit": "no rights reserved",
+  "llicencia": "CC0",
+  "url": "https://www.inaturalist.org/observations/341351028",
+  "font": "iNaturalist"
+ },
+ "tylopilus": {
+  "foto": "fotos/tylopilus_1.jpg",
+  "credit": "(c) Jose Castro, some rights reserved (CC BY)",
+  "llicencia": "CC-BY",
+  "url": "https://www.inaturalist.org/observations/237313566",
+  "font": "iNaturalist"
+ },
+ "oureig": {
+  "foto": "fotos/oureig_1.jpg",
+  "credit": "(c) Roland Godon, some rights reserved (CC BY)",
+  "llicencia": "CC-BY",
+  "url": "https://www.inaturalist.org/observations/98794359",
+  "font": "iNaturalist"
+ },
+ "reigbord": {
+  "foto": "fotos/reigbord_1.jpg",
+  "credit": "(c) Boris Grozev, some rights reserved (CC BY)",
+  "llicencia": "CC-BY",
+  "url": "https://www.inaturalist.org/observations/7900898",
+  "font": "iNaturalist"
+ },
+ "farinera": {
+  "foto": "fotos/farinera_3.jpg",
+  "credit": "(c) T R Shankar Raman, some rights reserved (CC BY)",
+  "llicencia": "CC-BY",
+  "url": "https://www.inaturalist.org/observations/142938015",
+  "font": "iNaturalist"
+ },
+ "llora": {
+  "foto": "fotos/llora_8.jpg",
+  "credit": "(c) Jose Castro, some rights reserved (CC BY)",
+  "llicencia": "CC-BY",
+  "url": "https://www.inaturalist.org/observations/123197132",
+  "font": "iNaturalist"
+ },
+ "rossinyol": {
+  "foto": "fotos/rossinyol_1.jpg",
+  "credit": "(c) Daniel Castanhal García, some rights reserved (CC BY)",
+  "llicencia": "CC-BY",
+  "url": "https://www.inaturalist.org/observations/360661188",
+  "font": "iNaturalist"
+ },
+ "omphalotus": {
+  "foto": "fotos/omphalotus_1.jpg",
+  "credit": "(c) Santiago Martín-Bravo, some rights reserved (CC BY)",
+  "llicencia": "CC-BY",
+  "url": "https://www.inaturalist.org/observations/251900798",
+  "font": "iNaturalist"
+ },
+ "girgola": {
+  "foto": "fotos/girgola_8.jpg",
+  "credit": "(c) Jose Castro, some rights reserved (CC BY)",
+  "llicencia": "CC-BY",
+  "url": "https://www.inaturalist.org/observations/37334982",
+  "font": "iNaturalist"
+ },
+ "apagallums": {
+  "foto": "fotos/apagallums_4.jpg",
+  "credit": "(c) Cristina Villaverde, some rights reserved (CC BY)",
+  "llicencia": "CC-BY",
+  "url": "https://www.inaturalist.org/observations/64513900",
+  "font": "iNaturalist"
+ },
+ "brunneo": {
+  "foto": "fotos/brunneo_7.jpg",
+  "credit": "(c) Elena A. Kizilova (Елена А. Кизилова), some rights reserved (CC BY)",
+  "llicencia": "CC-BY",
+  "url": "https://www.inaturalist.org/observations/29332101",
+  "font": "iNaturalist"
+ },
+ "fredolic": {
+  "foto": "fotos/fredolic_6.jpg",
+  "credit": "(c) victor laborde, some rights reserved (CC BY)",
+  "llicencia": "CC-BY",
+  "url": "https://www.inaturalist.org/observations/247782391",
+  "font": "iNaturalist"
+ },
+ "pardinum": {
+  "foto": "fotos/pardinum_1.jpg",
+  "credit": "no rights reserved",
+  "llicencia": "CC0",
+  "url": "https://www.inaturalist.org/observations/403908055",
+  "font": "iNaturalist"
+ },
+ "orellanus": {
+  "foto": "fotos/orellanus_1.jpg",
+  "credit": "(c) Jose Castro, some rights reserved (CC BY)",
+  "llicencia": "CC-BY",
+  "url": "https://www.inaturalist.org/observations/84954351",
+  "font": "iNaturalist"
+ },
+ "camperol": {
+  "foto": "fotos/camperol_6.jpg",
+  "credit": "no rights reserved",
+  "llicencia": "CC0",
+  "url": "https://www.inaturalist.org/observations/137642728",
+  "font": "iNaturalist"
+ },
+ "xanthodermus": {
+  "foto": "fotos/xanthodermus_1.jpg",
+  "credit": "no rights reserved",
+  "llicencia": "CC0",
+  "url": "https://www.inaturalist.org/observations/204066080",
+  "font": "iNaturalist"
+ },
+ "verna": {
+  "foto": "fotos/verna_4.jpg",
+  "credit": "no rights reserved",
+  "llicencia": "CC0",
+  "url": "https://www.inaturalist.org/observations/48049610",
+  "font": "iNaturalist"
+ },
+ "pantherina": {
+  "foto": "fotos/pantherina_1.jpg",
+  "credit": "no rights reserved",
+  "llicencia": "CC0",
+  "url": "https://www.inaturalist.org/observations/18312062",
+  "font": "iNaturalist"
+ },
+ "moixerno": {
+  "foto": "fotos/moixerno_3.jpg",
+  "credit": "(c) Lucian Clanet, some rights reserved (CC BY)",
+  "llicencia": "CC-BY",
+  "url": "https://www.inaturalist.org/observations/271014956",
+  "font": "iNaturalist"
+ },
+ "entoloma": {
+  "foto": "fotos/entoloma_1.jpg",
+  "credit": "(c) Lazar Popović, some rights reserved (CC BY)",
+  "llicencia": "CC-BY",
+  "url": "https://www.inaturalist.org/observations/138431069",
+  "font": "iNaturalist"
+ },
+ "camasec": {
+  "foto": "fotos/camasec_6.jpg",
+  "credit": "no rights reserved",
+  "llicencia": "CC0",
+  "url": "https://www.inaturalist.org/observations/62474362",
+  "font": "iNaturalist"
+ },
+ "dealbata": {
+  "foto": "fotos/dealbata_1.jpg",
+  "credit": "(c) Kurt Miller, some rights reserved (CC BY-SA)",
+  "llicencia": "CC-BY-SA",
+  "url": "https://www.inaturalist.org/observations/62173562",
+  "font": "iNaturalist"
+ },
+ "murgola": {
+  "foto": "fotos/murgola_1.jpg",
+  "credit": "(c) Nico Hernandez, some rights reserved (CC BY)",
+  "llicencia": "CC-BY",
+  "url": "https://www.inaturalist.org/observations/113861785",
+  "font": "iNaturalist"
+ },
+ "gyromitra": {
+  "foto": "fotos/gyromitra_3.jpg",
+  "credit": "(c) Lídia Carrera, some rights reserved (CC BY)",
+  "llicencia": "CC-BY",
+  "url": "https://www.inaturalist.org/observations/381730392",
+  "font": "iNaturalist"
+ },
+ "pinetell": {
+  "foto": "fotos/pinetell_5.jpg",
+  "credit": "(c) Lídia Carrera, some rights reserved (CC BY)",
+  "llicencia": "CC-BY",
+  "url": "https://www.inaturalist.org/observations/320362633",
+  "font": "iNaturalist"
+ },
+ "llenega": {
+  "foto": "fotos/llenega_1.jpg",
+  "credit": "Paffka (CC BY-SA 3.0), via Wikimedia Commons",
+  "llicencia": "CC BY-SA 3.0",
+  "url": "https://commons.wikimedia.org/wiki/File:Hygrophorus_latitabundus1.JPG",
+  "font": "Wikimedia Commons"
+ },
+ "tinta": {
+  "foto": "fotos/tinta_7.jpg",
+  "credit": "(c) Nico Hernandez, some rights reserved (CC BY)",
+  "llicencia": "CC-BY",
+  "url": "https://www.inaturalist.org/observations/63837274",
+  "font": "iNaturalist"
+ },
+ "atramentaria": {
+  "foto": "fotos/atramentaria_2.jpg",
+  "credit": "(c) Josep Fracés Balaguer, some rights reserved (CC BY)",
+  "llicencia": "CC-BY",
+  "url": "https://www.inaturalist.org/observations/410950822",
+  "font": "iNaturalist"
+ },
+ "galerina": {
+  "foto": "fotos/galerina_1.jpg",
+  "credit": "(c) victor laborde, some rights reserved (CC BY)",
+  "llicencia": "CC-BY",
+  "url": "https://www.inaturalist.org/observations/342568493",
+  "font": "iNaturalist"
+ },
+ "hypholoma": {
+  "foto": "fotos/hypholoma_1.jpg",
+  "credit": "(c) Jose Castro, some rights reserved (CC BY)",
+  "llicencia": "CC-BY",
+  "url": "https://www.inaturalist.org/observations/320176978",
+  "font": "iNaturalist"
+ },
+ "pimpinella": {
+  "foto": "fotos/pimpinella_1.jpg",
+  "credit": "(c) Carminda Santos, some rights reserved (CC BY)",
+  "llicencia": "CC-BY",
+  "url": "https://www.inaturalist.org/observations/103209804",
+  "font": "iNaturalist"
+ },
+ "carlet": {
+  "foto": "fotos/carlet_1.jpg",
+  "credit": "(c) victor laborde, some rights reserved (CC BY)",
+  "llicencia": "CC-BY",
+  "url": "https://www.inaturalist.org/observations/250781208",
+  "font": "iNaturalist"
+ },
+ "emetica": {
+  "foto": "fotos/emetica_5.jpg",
+  "credit": "(c) Eli Talhouk, some rights reserved (CC BY)",
+  "llicencia": "CC-BY",
+  "url": "https://www.inaturalist.org/observations/400890865",
+  "font": "iNaturalist"
+ },
+ "nebularis": {
+  "foto": "fotos/nebularis_1.jpg",
+  "credit": "(c) victor laborde, some rights reserved (CC BY)",
+  "llicencia": "CC-BY",
+  "url": "https://www.inaturalist.org/observations/248040382",
+  "font": "iNaturalist"
+ },
+ "inocybe": {
+  "foto": "fotos/inocybe_1.jpg",
+  "credit": "(c) Jose Castro, some rights reserved (CC BY)",
+  "llicencia": "CC-BY",
+  "url": "https://www.inaturalist.org/observations/383668563",
+  "font": "iNaturalist"
+ },
+ "bolaneu": {
+  "foto": "fotos/bolaneu_5.jpg",
+  "credit": "(c) Jose Castro, some rights reserved (CC BY)",
+  "llicencia": "CC-BY",
+  "url": "https://www.inaturalist.org/observations/237252351",
+  "font": "iNaturalist"
+ },
+ "paxillus": {
+  "foto": "fotos/paxillus_5.jpg",
+  "credit": "(c) Carminda Santos, some rights reserved (CC BY)",
+  "llicencia": "CC-BY",
+  "url": "https://www.inaturalist.org/observations/185114498",
+  "font": "iNaturalist"
+ },
+ "petllop": {
+  "foto": "fotos/petllop_1.jpg",
+  "credit": "(c) zebedeugalinha, some rights reserved (CC BY)",
+  "llicencia": "CC-BY",
+  "url": "https://www.inaturalist.org/observations/327598860",
+  "font": "iNaturalist"
+ },
+ "scleroderma": {
+  "foto": "fotos/scleroderma_1.jpg",
+  "credit": "(c) Gijs Romijn, some rights reserved (CC BY)",
+  "llicencia": "CC-BY",
+  "url": "https://www.inaturalist.org/observations/234351148",
+  "font": "iNaturalist"
+ },
+ "camagroc": {
+  "foto": "fotos/camagroc_1.jpg",
+  "credit": "(c) Darío Estraviz López, some rights reserved (CC BY)",
+  "llicencia": "CC-BY",
+  "url": "https://www.inaturalist.org/observations/252073985",
+  "font": "iNaturalist"
+ },
+ "trompeta": {
+  "foto": "fotos/trompeta_1.jpg",
+  "credit": "(c) Jose Castro, some rights reserved (CC BY)",
+  "llicencia": "CC-BY",
+  "url": "https://www.inaturalist.org/observations/184532160",
+  "font": "iNaturalist"
+ }
+}

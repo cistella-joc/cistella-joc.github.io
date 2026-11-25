@@ -943,6 +943,7 @@ function judge(b, choice) {
 }
 
 function start() {
+  compta("partides");
   st = { deck: newDeck(), i: 0, n: 0, lives: 3, score: 0, streak: 0, best: 0, hits: 0, seenMortal: [], busy: false, dead: false, timer: 0 };
   $("start").hidden = true; $("end").hidden = true;
   renderHud(); renderCards();
@@ -1089,6 +1090,7 @@ function next() {
 }
 
 function end() {
+  compta("acabades");
   let best = st.score;
   try { best = Math.max(best, +localStorage.getItem("cistella-best-v2") || 0); localStorage.setItem("cistella-best-v2", best); } catch (e) {}
   const killed = st.deck[st.i - 1] && st.deck[st.i - 1].cat === "mortal" && st.lastMortal;
@@ -1185,6 +1187,16 @@ const dbReady = FIREBASE_CONFIG
       .catch(() => { db = null; })
   : Promise.resolve();
 
+/* Estadístiques anònimes: un comptador per dia a Firestore (stats/AAAA-MM-DD), sense dades personals */
+function compta(camp) {
+  dbReady.then(() => {
+    if (!db) return;
+    const dia = new Date().toLocaleDateString("sv-SE", { timeZone: "Europe/Madrid" });
+    db.collection("stats").doc(dia).set({ [camp]: firebase.firestore.FieldValue.increment(1) }, { merge: true }).catch(() => {});
+  });
+}
+try { if (!sessionStorage.getItem("cistella-visita")) { sessionStorage.setItem("cistella-visita", "1"); compta("visites"); } } catch (e) { compta("visites"); }
+
 /* Podi de la pantalla d'inici */
 async function showPodi() {
   await dbReady;
@@ -1266,7 +1278,9 @@ function shareText() {
     : `He fet ${st.score} punts a Cistella! (${st.hits}/${st.n} bolets) 🧺`;
   return `${cap}\nSaps distingir un rovelló d'una farinera borda? 🍄\n${SITE}`;
 }
+$("btnWa").addEventListener("click", () => compta("compartits"));
 $("btnShare").onclick = async () => {
+  compta("compartits");
   const text = shareText();
   try {
     if (navigator.share) { await navigator.share({ text }); return; }

@@ -1477,10 +1477,17 @@ const dbReady = FIREBASE_CONFIG
   : Promise.resolve();
 
 /* Estadístiques anònimes: un comptador per dia a Firestore (stats/AAAA-MM-DD), sense dades personals */
+// data AAAA-MM-DD a l'hora de Catalunya, igual a tots els navegadors
+function diaMadrid(d) {
+  const p = {};
+  new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Madrid", year: "numeric", month: "2-digit", day: "2-digit" })
+    .formatToParts(d).forEach(x => { p[x.type] = x.value; });
+  return `${p.year}-${p.month}-${p.day}`;
+}
 function compta(camp) {
   dbReady.then(() => {
     if (!db) return;
-    const dia = new Date().toLocaleDateString("sv-SE", { timeZone: "Europe/Madrid" });
+    const dia = diaMadrid(new Date());
     db.collection("stats").doc(dia).set({ [camp]: firebase.firestore.FieldValue.increment(1) }, { merge: true }).catch(() => {});
   });
 }

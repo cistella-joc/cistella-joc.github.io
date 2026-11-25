@@ -77,7 +77,7 @@ const FIREBASE_CONFIG = {
 };
 const $ = id => document.getElementById(id);
 const fmt = n => n.toLocaleString("ca-ES");
-const dayKey = d => d.toLocaleDateString("sv-SE", { timeZone: "Europe/Madrid" });
+const dayKey = d => { const p = {}; new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Madrid", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(d).forEach(x => { p[x.type] = x.value; }); return `${p.year}-${p.month}-${p.day}`; };
 
 async function load() {
   firebase.initializeApp(FIREBASE_CONFIG);

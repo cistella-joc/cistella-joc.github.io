@@ -323,6 +323,7 @@ button:focus-visible { outline: 3px solid var(--rovello); outline-offset: 3px; }
     <h2>Qui som</h2>
     <p>Cistella! és un joc fet a Valls per Francesc, que fa projectes digitals i audiovisuals.</p>
     <p>Si organitzes una fira del bolet, formes part d'una associació o tens un projecte on encaixaria un joc com aquest, escriu-me. També m'és molt útil saber si has trobat alguna errada en un bolet o en una foto.</p>
+    <p>Escriu-me a <a id="cEmail" style="color:#f0b45a;font-weight:800;word-break:break-all" href="#">(activa JavaScript per veure el correu)</a> o fes servir aquest formulari:</p>
     <form class="cform" id="cform" novalidate>
       <label for="cNom">Nom <small>(opcional)</small><input id="cNom" maxlength="60" autocomplete="name"></label>
       <label for="cMail">Correu, si vols resposta <small>(opcional)</small><input id="cMail" type="email" maxlength="120" autocomplete="email"></label>
@@ -1219,6 +1220,9 @@ $("saveForm").addEventListener("submit", async e => {
   showRank(db ? "global" : "local");
 });
 /* Contacte: els missatges es guarden a la col·lecció "missatges" de Firestore */
+// el correu es munta aquí perquè els robots que recullen adreces no el trobin al codi
+(() => { const u = ["francesc", "ferre", "magrinya"].join("."), d = ["gmail", "com"].join("."), m = u + "@" + d;
+  const a = $("cEmail"); a.textContent = m; a.href = "mailto:" + m; })();
 function showAbout() { $("about").hidden = false; $("about").scrollTop = 0; $("cMsg").textContent = ""; }
 $("btnAbout1").onclick = showAbout;
 $("btnAbout2").onclick = showAbout;

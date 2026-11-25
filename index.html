@@ -114,10 +114,12 @@ button:focus-visible { outline: 3px solid var(--rovello); outline-offset: 3px; }
 .flash .n { background: var(--crema); color: var(--escorca); border-radius: 18px; padding: 12px 16px; display: flex; flex-direction: column; gap: 6px; align-items: center; box-shadow: 0 12px 30px rgba(0,0,0,.45); max-width: 92%; }
 .flash .n b { font-size: 19px; }
 .flash .n i { font-size: 14px; color: #7a6250; }
+.flash .n p { margin: 2px 0 0; font-size: 14.5px; line-height: 1.45; text-align: left; max-width: 46ch; }
+.flash .tap { font-size: 12.5px; font-weight: 700; color: #c9d2b4; }
 .flash .why { border: 0; background: transparent; color: var(--crema); font-weight: 800; font-size: 15px; text-decoration: underline; text-underline-offset: 3px; padding: 8px; }
 .timer { width: 140px; height: 4px; background: rgba(247,236,214,.2); border-radius: 4px; overflow: hidden; }
 .timer i { display: block; height: 100%; background: var(--crema); width: 100%; }
-.flash.show .timer i { animation: drain 1.6s linear forwards; }
+.flash.show .timer i { animation: drain var(--dur, 4s) linear forwards; }
 @keyframes drain { to { width: 0; } }
 
 /* Full de resultat */
@@ -180,7 +182,24 @@ button:focus-visible { outline: 3px solid var(--rovello); outline-offset: 3px; }
 }
 .ad small { font-weight: 600; opacity: .8; }
 .linkbtn { background: none; border: 0; color: #c9d2b4; font-weight: 700; font-size: 13.5px; text-decoration: underline; text-underline-offset: 3px; padding: 6px; }
-#credits { justify-content: flex-start; text-align: left; }
+#credits, #rank { justify-content: flex-start; text-align: left; }
+#rank h2 { font-family: var(--display); font-weight: 800; font-size: 30px; margin: 8px 0 0; }
+.tabs { display: flex; gap: 6px; }
+.tabs button { border: 0; border-radius: 99px; padding: 7px 14px; font-weight: 800; font-size: 13.5px; background: rgba(247,236,214,.1); color: var(--crema); }
+.tabs button[aria-pressed="true"] { background: var(--rovello); color: #2a1608; }
+.rlist { list-style: none; margin: 0; padding: 0; width: 100%; display: grid; gap: 6px; counter-reset: r; }
+.rlist li { counter-increment: r; display: grid; grid-template-columns: 30px 1fr auto; align-items: center; gap: 8px; background: rgba(247,236,214,.07); border: 1px solid rgba(247,236,214,.12); border-radius: 12px; padding: 9px 12px; font-size: 15px; }
+.rlist li::before { content: counter(r); font-family: var(--display); font-weight: 800; font-size: 18px; color: #c9a24a; }
+.rlist li.me { border-color: var(--rovello); background: rgba(224,122,46,.15); }
+.rlist b { font-variant-numeric: tabular-nums; font-family: var(--display); font-size: 18px; }
+.rlist .empty { display: block; color: #c9d2b4; }
+.rlist .empty::before { content: none; }
+.save { display: flex; gap: 8px; }
+.save input { flex: 1; min-width: 0; border: 2px solid rgba(63,42,29,.25); border-radius: 12px; padding: 10px 12px; font: inherit; font-weight: 700; background: #fffaf0; color: var(--escorca); }
+.save input:focus-visible { outline: 3px solid var(--rovello); outline-offset: 1px; }
+.save button { border: 0; border-radius: 12px; padding: 10px 14px; font-weight: 800; background: var(--escorca); color: var(--crema); }
+.save button:disabled { opacity: .55; }
+.saved { font-size: 13.5px; font-weight: 700; color: var(--ok); min-height: 1em; }
 #credits h2 { font-family: var(--display); font-weight: 800; font-size: 30px; margin: 8px 0 0; }
 #credits .intro { font-size: 13.5px; color: #c9d2b4; margin: 0; line-height: 1.45; max-width: 60ch; }
 .clist { list-style: none; margin: 0; padding: 0; width: 100%; display: grid; gap: 6px; }
@@ -188,7 +207,7 @@ button:focus-visible { outline: 3px solid var(--rovello); outline-offset: 3px; }
 .clist b { color: var(--crema); }
 .clist a { color: #f0b45a; }
 .clist .who { color: #c9d2b4; }
-#credits .big { position: sticky; bottom: 0; align-self: center; flex: none; }
+#credits .big, #rank .big { position: sticky; bottom: 0; align-self: center; flex: none; }
 @media (max-height: 640px) {
   .hero { width: min(100%, 280px); }
 }
@@ -233,7 +252,7 @@ button:focus-visible { outline: 3px solid var(--rovello); outline-offset: 3px; }
     </div>
     <button class="big" id="btnStart">Anem a buscar bolets</button>
     <p class="disc">És un joc, no una guia. Mai no mengis un bolet identificat amb una pantalla: porta'l a una associació micològica o a un expert.</p>
-    <button class="linkbtn" id="btnCred1">Crèdits de les fotos</button>
+    <div style="display:flex;gap:14px"><button class="linkbtn" id="btnRank1">Rànquing</button><button class="linkbtn" id="btnCred1">Crèdits de les fotos</button></div>
   </section>
 
   <section class="screen" id="end" hidden>
@@ -245,6 +264,14 @@ button:focus-visible { outline: 3px solid var(--rovello); outline-offset: 3px; }
         <div class="stat"><b id="stHits">0</b><span>encerts</span></div>
         <div class="stat"><b id="stBest">0</b><span>rècord</span></div>
       </div>
+      <div>
+        <div style="font-size:13px;font-weight:800;margin-bottom:6px">Apunta't al rànquing</div>
+        <form class="save" id="saveForm">
+          <input id="nom" maxlength="16" placeholder="El teu nom" autocomplete="nickname" aria-label="El teu nom">
+          <button id="btnSave" type="submit">Desa</button>
+        </form>
+        <div class="saved" id="savedMsg"></div>
+      </div>
       <div id="mortalWrap">
         <div style="font-size:13px;font-weight:800;margin-bottom:6px">Els que maten, i ja els has vist:</div>
         <div class="mortals" id="mortalList"></div>
@@ -252,9 +279,19 @@ button:focus-visible { outline: 3px solid var(--rovello); outline-offset: 3px; }
     </div>
     <button class="big" id="btnAgain">Torna al bosc</button>
     <div class="ad" role="note">Espai per a anunci<small>Prototip: aquí aniria el bàner d'AdSense o AdMob</small></div>
-    <button class="linkbtn" id="btnCred2">Crèdits de les fotos</button>
+    <div style="display:flex;gap:14px"><button class="linkbtn" id="btnRank2">Rànquing</button><button class="linkbtn" id="btnCred2">Crèdits de les fotos</button></div>
     <p class="disc">Il·lustracions orientatives. Per identificar bolets cal veure'ls en mà: olor, làtex, base del peu, color en tallar-los.</p>
   </section>
+  <section class="screen" id="rank" hidden>
+    <h2>Rànquing</h2>
+    <div class="tabs" id="rankTabs">
+      <button data-t="global" aria-pressed="true">Tothom</button>
+      <button data-t="local" aria-pressed="false">Aquest mòbil</button>
+    </div>
+    <ol class="rlist" id="rlist"></ol>
+    <button class="big" id="btnRankClose">Tanca</button>
+  </section>
+
   <section class="screen" id="credits" hidden>
     <h2>Crèdits</h2>
     <p class="intro">Les fotos són de persones que les comparteixen amb llicències lliures a iNaturalist i Wikimedia Commons. Gràcies! Al joc es mostren retallades per encaixar a la targeta.</p>
@@ -926,13 +963,19 @@ function showFlash(b, res, gained) {
   const fl = $("flash");
   fl.innerHTML = `
     <div class="v" style="color:${res.ok ? "#9fd36a" : "#f0b45a"}">${res.ok ? `+${gained}` : res.verdict}</div>
-    <div class="n"><b>${b.nom}</b>${b.nom !== b.sci ? `<i>${b.sci}</i>` : ""}<span class="badge" style="background:${c.color}">${c.label}</span></div>
+    <div class="n"><b>${b.nom}</b>${b.nom !== b.sci ? `<i>${b.sci}</i>` : ""}<span class="badge" style="background:${c.color}">${c.label}</span><p>${b.text}</p></div>
     <div class="timer"><i></i></div>
-    <button class="why" id="btnWhy">Per què?</button>`;
+    <div class="tap">Toca per continuar</div>
+    ${b.conf.length ? `<button class="why" id="btnWhy">Amb què es confon?</button>` : ""}`;
+  // temps segons la llargada del text: entre 3,5 i 8 segons
+  const dur = Math.min(8000, Math.max(3500, 1500 + b.text.length * 30));
+  fl.style.setProperty("--dur", dur + "ms");
   void fl.offsetWidth;
   fl.classList.add("show");
-  st.timer = setTimeout(() => { fl.classList.remove("show"); next(); }, 1600);
-  $("btnWhy").onclick = () => { clearTimeout(st.timer); fl.classList.remove("show"); showSheet(b, res, gained); };
+  const go = () => { clearTimeout(st.timer); fl.onclick = null; fl.classList.remove("show"); next(); };
+  st.timer = setTimeout(go, dur);
+  fl.onclick = e => { if (e.target.id !== "btnWhy") go(); };
+  if ($("btnWhy")) $("btnWhy").onclick = () => { clearTimeout(st.timer); fl.onclick = null; fl.classList.remove("show"); showSheet(b, res, gained); };
 }
 
 function showSheet(b, res, gained) {
@@ -977,6 +1020,9 @@ function end() {
   $("stBest").textContent = best;
   $("mortalWrap").hidden = !st.seenMortal.length;
   $("mortalList").innerHTML = st.seenMortal.map(k => `<span class="chip">${BY_ID[k].nom}</span>`).join("");
+  $("btnSave").disabled = false;
+  $("savedMsg").textContent = "";
+  try { $("nom").value = localStorage.getItem("cistella-nom") || ""; } catch (e) {}
   $("end").hidden = false;
 }
 
@@ -997,7 +1043,7 @@ $("btnAgain").onclick = start;
 $("btnNo").onclick = () => commit("bosc");
 $("btnYes").onclick = () => commit("cistella");
 document.addEventListener("keydown", e => {
-  if (!st || !$("start").hidden || !$("end").hidden || !$("credits").hidden) return;
+  if (!st || !$("start").hidden || !$("end").hidden || !$("credits").hidden || !$("rank").hidden) return;
   if ($("sheet").classList.contains("open") || $("flash").classList.contains("show")) return;
   if (e.key === "ArrowRight") commit("cistella");
   if (e.key === "ArrowLeft") commit("bosc");
@@ -1028,6 +1074,85 @@ fetch("fotos.json").then(r => r.ok ? r.json() : {}).then(j => {
       autor, credit: autor === "Domini públic" ? "domini públic (CC0)" : `${autor} · ${lic.nom}` });
   }
 }).catch(() => {});
+
+/* ------------------ Rànquing ------------------
+   Local: es guarda al navegador. Global: Firebase Firestore, només si hi ha configuració. */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCrGi81dW1USnsRPlUddDNVPck-zQZxt20",
+  authDomain: "cistella-b671a.firebaseapp.com",
+  projectId: "cistella-b671a",
+  storageBucket: "cistella-b671a.firebasestorage.app",
+  messagingSenderId: "204191160309",
+  appId: "1:204191160309:web:d932a10754e1334615f2bc"
+};
+let db = null, rankTab = "global", lastSaved = null;
+
+function loadScript(src) { return new Promise((ok, ko) => { const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = ko; document.head.appendChild(s); }); }
+if (FIREBASE_CONFIG) {
+  const v = "10.12.2";
+  loadScript(`https://www.gstatic.com/firebasejs/${v}/firebase-app-compat.js`)
+    .then(() => loadScript(`https://www.gstatic.com/firebasejs/${v}/firebase-firestore-compat.js`))
+    .then(() => { firebase.initializeApp(FIREBASE_CONFIG); db = firebase.firestore(); })
+    .catch(() => { db = null; });
+}
+
+function localRank() { try { return JSON.parse(localStorage.getItem("cistella-rank") || "[]"); } catch (e) { return []; } }
+function saveLocal(entry) {
+  const r = localRank().concat(entry).sort((a, b) => b.punts - a.punts).slice(0, 20);
+  try { localStorage.setItem("cistella-rank", JSON.stringify(r)); } catch (e) {}
+}
+async function globalRank() {
+  if (!db) return null;
+  const snap = await db.collection("ranking").orderBy("punts", "desc").limit(30).get();
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+async function showRank(tab) {
+  rankTab = tab || rankTab;
+  if (!db && rankTab === "global") rankTab = "local";
+  document.querySelectorAll("#rankTabs button").forEach(b => b.setAttribute("aria-pressed", b.dataset.t === rankTab));
+  $("rank").hidden = false; $("rank").scrollTop = 0;
+  const L = $("rlist");
+  const row = (e, me) => `<li class="${me ? "me" : ""}"><span>${esc(e.nom)}</span><b>${e.punts}</b></li>`;
+  if (rankTab === "local") {
+    const r = localRank();
+    L.innerHTML = r.length ? r.map(e => row(e, lastSaved && e.t === lastSaved.t)).join("") : `<li class="empty">Encara no hi ha cap partida desada en aquest mòbil.</li>`;
+    if (!db) L.innerHTML += `<li class="empty">El rànquing de tothom s'activa quan el joc està connectat a Firebase.</li>`;
+    return;
+  }
+  L.innerHTML = `<li class="empty">Carregant…</li>`;
+  try {
+    const r = await globalRank();
+    L.innerHTML = r.length ? r.map(e => row(e, lastSaved && e.id === lastSaved.id)).join("") : `<li class="empty">Encara no hi ha ningú. Sigues el primer!</li>`;
+  } catch (e) {
+    L.innerHTML = `<li class="empty">No s'ha pogut carregar el rànquing. Comprova la connexió.</li>`;
+  }
+}
+function esc(t) { return String(t).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+
+$("saveForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const nom = $("nom").value.trim().replace(/\s+/g, " ").slice(0, 16);
+  if (!nom) { $("savedMsg").textContent = "Escriu un nom per apuntar-te."; $("nom").focus(); return; }
+  if (!st || st.score <= 0) { $("savedMsg").textContent = "Amb 0 punts no s'apunta al rànquing."; return; }
+  try { localStorage.setItem("cistella-nom", nom); } catch (e) {}
+  $("btnSave").disabled = true;
+  const entry = { nom, punts: st.score, encerts: st.hits, t: Date.now() };
+  saveLocal(entry);
+  lastSaved = { t: entry.t };
+  if (db) {
+    try {
+      const ref = await db.collection("ranking").add({ nom, punts: st.score, encerts: st.hits, data: firebase.firestore.FieldValue.serverTimestamp() });
+      lastSaved.id = ref.id;
+      $("savedMsg").textContent = "Desat al rànquing!";
+    } catch (err) { $("savedMsg").textContent = "Desat en aquest mòbil. El rànquing de tothom no respon ara."; }
+  } else $("savedMsg").textContent = "Desat al rànquing d'aquest mòbil.";
+  showRank(db ? "global" : "local");
+});
+$("btnRank1").onclick = () => showRank();
+$("btnRank2").onclick = () => showRank();
+$("btnRankClose").onclick = () => { $("rank").hidden = true; };
+document.querySelectorAll("#rankTabs button").forEach(b => b.onclick = () => showRank(b.dataset.t));
 
 function showCredits() {
   const fotos = BOLETS.filter(b => b.foto);

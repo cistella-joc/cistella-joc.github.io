@@ -189,6 +189,20 @@ button:focus-visible { outline: 3px solid var(--rovello); outline-offset: 3px; }
 .podi li .m { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 800; color: #2a1608; }
 .podi li b { font-family: var(--display); font-variant-numeric: tabular-nums; }
 .podi .buit { font-size: 13.5px; color: #c9d2b4; font-weight: 600; }
+#about { justify-content: flex-start; text-align: left; }
+#about h2 { font-family: var(--display); font-weight: 800; font-size: 30px; margin: 8px 0 0; }
+#about p { margin: 0; font-size: 15px; line-height: 1.5; max-width: 60ch; color: #e8dcc0; }
+.cform { width: 100%; display: flex; flex-direction: column; gap: 10px; background: var(--crema); color: var(--escorca); border-radius: 20px; padding: 16px; }
+.cform label { font-size: 13px; font-weight: 800; display: flex; flex-direction: column; gap: 4px; }
+.cform input, .cform textarea { border: 2px solid rgba(63,42,29,.22); border-radius: 12px; padding: 10px 12px; font: inherit; font-weight: 600; background: #fffaf0; color: var(--escorca); }
+.cform textarea { min-height: 120px; resize: vertical; }
+.cform input:focus-visible, .cform textarea:focus-visible { outline: 3px solid var(--rovello); outline-offset: 1px; }
+.cform small { font-weight: 600; color: #7a6250; }
+.cform .send { border: 0; border-radius: 14px; padding: 13px; font-weight: 800; font-size: 16px; background: var(--rovello); color: #2a1608; }
+.cform .send:disabled { opacity: .55; }
+.cmsg { font-size: 14px; font-weight: 700; min-height: 1em; }
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.links { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
 .linkbtn { background: none; border: 0; color: #c9d2b4; font-weight: 700; font-size: 13.5px; text-decoration: underline; text-underline-offset: 3px; padding: 6px; }
 #credits, #rank { justify-content: flex-start; text-align: left; }
 #rank h2 { font-family: var(--display); font-weight: 800; font-size: 30px; margin: 8px 0 0; }
@@ -215,7 +229,7 @@ button:focus-visible { outline: 3px solid var(--rovello); outline-offset: 3px; }
 .clist b { color: var(--crema); }
 .clist a { color: #f0b45a; }
 .clist .who { color: #c9d2b4; }
-#credits .big, #rank .big { position: sticky; bottom: 0; align-self: center; flex: none; }
+#credits .big, #rank .big, #about .big { position: sticky; bottom: 0; align-self: center; flex: none; }
 @media (max-height: 640px) {
   .hero { width: min(100%, 280px); }
 }
@@ -265,7 +279,7 @@ button:focus-visible { outline: 3px solid var(--rovello); outline-offset: 3px; }
       <ol id="podiList"><li class="buit" style="display:block">Carregant…</li></ol>
     </div>
     <p class="disc">És un joc, no una guia. Mai no mengis un bolet identificat amb una pantalla: porta'l a una associació micològica o a un expert.</p>
-    <div style="display:flex;gap:14px"><button class="linkbtn" id="btnRank1">Rànquing</button><button class="linkbtn" id="btnCred1">Crèdits de les fotos</button></div>
+    <div class="links"><button class="linkbtn" id="btnRank1">Rànquing</button><button class="linkbtn" id="btnCred1">Crèdits de les fotos</button><button class="linkbtn" id="btnAbout1">Qui som i contacte</button></div>
   </section>
 
   <section class="screen" id="end" hidden>
@@ -292,7 +306,7 @@ button:focus-visible { outline: 3px solid var(--rovello); outline-offset: 3px; }
     </div>
     <button class="big" id="btnAgain">Torna al bosc</button>
     <div class="ad" role="note">Espai per a anunci<small>Prototip: aquí aniria el bàner d'AdSense o AdMob</small></div>
-    <div style="display:flex;gap:14px"><button class="linkbtn" id="btnRank2">Rànquing</button><button class="linkbtn" id="btnCred2">Crèdits de les fotos</button></div>
+    <div class="links"><button class="linkbtn" id="btnRank2">Rànquing</button><button class="linkbtn" id="btnCred2">Crèdits de les fotos</button><button class="linkbtn" id="btnAbout2">Qui som i contacte</button></div>
     <p class="disc">Il·lustracions orientatives. Per identificar bolets cal veure'ls en mà: olor, làtex, base del peu, color en tallar-los.</p>
   </section>
   <section class="screen" id="rank" hidden>
@@ -303,6 +317,22 @@ button:focus-visible { outline: 3px solid var(--rovello); outline-offset: 3px; }
     </div>
     <ol class="rlist" id="rlist"></ol>
     <button class="big" id="btnRankClose">Tanca</button>
+  </section>
+
+  <section class="screen" id="about" hidden>
+    <h2>Qui som</h2>
+    <p>Cistella! és un joc fet a Valls per Francesc, que fa projectes digitals i audiovisuals.</p>
+    <p>Si organitzes una fira del bolet, formes part d'una associació o tens un projecte on encaixaria un joc com aquest, escriu-me. També m'és molt útil saber si has trobat alguna errada en un bolet o en una foto.</p>
+    <form class="cform" id="cform" novalidate>
+      <label for="cNom">Nom <small>(opcional)</small><input id="cNom" maxlength="60" autocomplete="name"></label>
+      <label for="cMail">Correu, si vols resposta <small>(opcional)</small><input id="cMail" type="email" maxlength="120" autocomplete="email"></label>
+      <label for="cText">Missatge<textarea id="cText" maxlength="1500" required></textarea></label>
+      <div class="hp" aria-hidden="true"><label for="cWeb">Web<input id="cWeb" tabindex="-1" autocomplete="off"></label></div>
+      <small>El correu només es farà servir per respondre't.</small>
+      <button class="send" id="cSend" type="submit">Envia el missatge</button>
+      <div class="cmsg" id="cMsg" role="status"></div>
+    </form>
+    <button class="big" id="btnAboutClose">Tanca</button>
   </section>
 
   <section class="screen" id="credits" hidden>
@@ -1068,7 +1098,7 @@ $("btnAgain").onclick = start;
 $("btnNo").onclick = () => commit("bosc");
 $("btnYes").onclick = () => commit("cistella");
 document.addEventListener("keydown", e => {
-  if (!st || !$("start").hidden || !$("end").hidden || !$("credits").hidden || !$("rank").hidden) return;
+  if (!st || !$("start").hidden || !$("end").hidden || !$("credits").hidden || !$("rank").hidden || !$("about").hidden) return;
   if ($("sheet").classList.contains("open") || $("flash").classList.contains("show")) return;
   if (e.key === "ArrowRight") commit("cistella");
   if (e.key === "ArrowLeft") commit("bosc");
@@ -1188,6 +1218,30 @@ $("saveForm").addEventListener("submit", async e => {
   } else $("savedMsg").textContent = "Desat al rànquing d'aquest mòbil.";
   showRank(db ? "global" : "local");
 });
+/* Contacte: els missatges es guarden a la col·lecció "missatges" de Firestore */
+function showAbout() { $("about").hidden = false; $("about").scrollTop = 0; $("cMsg").textContent = ""; }
+$("btnAbout1").onclick = showAbout;
+$("btnAbout2").onclick = showAbout;
+$("btnAboutClose").onclick = () => { $("about").hidden = true; };
+$("cform").addEventListener("submit", async e => {
+  e.preventDefault();
+  const msg = $("cMsg"), text = $("cText").value.trim(), mail = $("cMail").value.trim();
+  if ($("cWeb").value) return; // trampa per a robots
+  if (text.length < 5) { msg.style.color = "var(--mort)"; msg.textContent = "Escriu el missatge abans d'enviar-lo."; $("cText").focus(); return; }
+  if (mail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) { msg.style.color = "var(--mort)"; msg.textContent = "Revisa l'adreça de correu: sembla que no és correcta."; $("cMail").focus(); return; }
+  $("cSend").disabled = true; msg.style.color = "var(--escorca)"; msg.textContent = "Enviant…";
+  await dbReady;
+  try {
+    if (!db) throw new Error("sense connexió");
+    await db.collection("missatges").add({ nom: $("cNom").value.trim().slice(0, 60), correu: mail.slice(0, 120), text: text.slice(0, 1500), data: firebase.firestore.FieldValue.serverTimestamp() });
+    msg.style.color = "var(--ok)"; msg.textContent = "Missatge enviat. Gràcies!";
+    $("cText").value = "";
+  } catch (err) {
+    msg.style.color = "var(--mort)"; msg.textContent = "No s'ha pogut enviar. Comprova la connexió i torna-ho a provar.";
+  }
+  $("cSend").disabled = false;
+});
+
 $("btnRank1").onclick = () => showRank();
 $("btnRank3").onclick = () => showRank("global");
 showPodi();

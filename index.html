@@ -217,6 +217,8 @@ button:focus-visible { outline: 3px solid var(--rovello); outline-offset: 3px; }
 .cform small { font-weight: 600; color: #7a6250; }
 .cform .send { border: 0; border-radius: 14px; padding: 13px; font-weight: 800; font-size: 16px; background: var(--rovello); color: #2a1608; }
 .cform .send:disabled { opacity: .55; }
+.itch { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 13px 16px; border-radius: 14px; background: #fa5c5c; color: #fff; font-weight: 800; font-size: 16px; text-decoration: none; }
+.itch svg { width: 22px; height: 22px; flex: none; }
 .cmsg { font-size: 14px; font-weight: 700; min-height: 1em; }
 .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 .links { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
@@ -356,6 +358,8 @@ button:focus-visible { outline: 3px solid var(--rovello); outline-offset: 3px; }
     <h2 data-i18n="aboutTitle">Qui som</h2>
     <p data-i18n="about1">Cistella! és un joc fet a Valls per Francesc, que fa projectes digitals i audiovisuals.</p>
     <p data-i18n="about2">Si organitzes una fira del bolet, formes part d'una associació o tens un projecte on encaixaria un joc com aquest, escriu-me. També m'és molt útil saber si has trobat alguna errada en un bolet o en una foto.</p>
+    <p data-i18n="itchNote">Si t'ha agradat, deixa-hi una valoració o un comentari: ajuda molt que el joc arribi a més gent.</p>
+    <a class="itch" href="https://siskubates.itch.io/cistella" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.3l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z" fill="currentColor"/></svg><span data-i18n="itch">Valora'l a itch.io</span></a>
     <p><span data-i18n="about3a">Escriu-me a</span> <a id="cEmail" style="color:#f0b45a;font-weight:800;word-break:break-all" href="#">(activa JavaScript per veure el correu)</a> <span data-i18n="about3b">o fes servir aquest formulari:</span></p>
     <form class="cform" id="cform" novalidate>
       <label for="cNom"><span><span data-i18n="fName">Nom</span> <small data-i18n="optional">(opcional)</small></span><input id="cNom" maxlength="60" autocomplete="name"></label>
@@ -434,7 +438,7 @@ const I18N = {
     publicDomain: "Domini públic", creditCC0: "domini públic (CC0)", originalAt: "foto original a",
     illusNote: "Els bolets sense foto es mostren amb il·lustracions pròpies del joc.",
     allIllus: "Totes les imatges d'aquesta versió són il·lustracions pròpies del joc.",
-    langLabel: "Idioma"
+    langLabel: "Idioma", itch: "Valora'l a itch.io", itchNote: "Si t'ha agradat, deixa-hi una valoració o un comentari: ajuda molt que el joc arribi a més gent."
   },
   es: {
     lives: "Vidas", points: "puntos", hits: "aciertos", record: "récord",
@@ -490,7 +494,7 @@ const I18N = {
     publicDomain: "Dominio público", creditCC0: "dominio público (CC0)", originalAt: "foto original en",
     illusNote: "Las setas sin foto se muestran con ilustraciones propias del juego.",
     allIllus: "Todas las imágenes de esta versión son ilustraciones propias del juego.",
-    langLabel: "Idioma"
+    langLabel: "Idioma", itch: "Valóralo en itch.io", itchNote: "Si te ha gustado, deja una valoración o un comentario: ayuda mucho a que el juego llegue a más gente."
   },
   en: {
     lives: "Lives", points: "points", hits: "correct", record: "best",
@@ -546,7 +550,7 @@ const I18N = {
     publicDomain: "Public domain", creditCC0: "public domain (CC0)", originalAt: "original photo on",
     illusNote: "Mushrooms without a photo are shown with the game's own illustrations.",
     allIllus: "All the images in this version are the game's own illustrations.",
-    langLabel: "Language"
+    langLabel: "Language", itch: "Rate it on itch.io", itchNote: "If you enjoyed it, leave a rating or a comment: it really helps the game reach more people."
   }
 };
 

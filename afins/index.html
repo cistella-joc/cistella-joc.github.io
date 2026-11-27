@@ -132,6 +132,11 @@ input.code { text-transform: uppercase; letter-spacing: 6px; text-align: center;
 .tabs { display: flex; gap: 6px; justify-content: center; }
 .tabs button { border: 0; border-radius: 99px; padding: 9px 16px; font-weight: 800; font-size: 15px; background: rgba(251,241,225,.12); color: var(--crema); }
 .tabs button[aria-pressed="true"] { background: var(--mostassa); color: var(--tinta); }
+.mapa { background: var(--crema); border-radius: 22px; padding: 10px; box-shadow: 0 12px 26px rgba(0,0,0,.3); }
+.mapa svg { display: block; width: 100%; height: auto; }
+.mapa text { font-family: var(--body); font-weight: 800; font-size: 13px; fill: var(--tinta); }
+.mapa .lbl-bg { fill: var(--crema); opacity: .85; }
+.llegenda { font-size: 13.5px; font-weight: 700; color: #f3dcc6; margin: 0; text-align: center; line-height: 1.45; }
 .confetti { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
 @media (prefers-reduced-motion: reduce) { .card.anim, .bar i { transition: none; } }
 </style>
@@ -217,8 +222,9 @@ input.code { text-transform: uppercase; letter-spacing: 6px; text-align: center;
   <!-- Resultats -->
   <section class="screen res" id="s-res">
     <h2>Resultats</h2>
-    <div class="tabs"><button data-t="tu" aria-pressed="true">Tu</button><button data-t="taula" aria-pressed="false">Tota la taula</button></div>
+    <div class="tabs"><button data-t="tu" aria-pressed="true">Tu</button><button data-t="mapa" aria-pressed="false">Mapa</button><button data-t="taula" aria-pressed="false">La taula</button></div>
     <div id="resTu" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div id="resMapa" style="display:none;flex-direction:column;gap:12px"></div>
     <div id="resTaula" style="display:none;flex-direction:column;gap:12px"></div>
     <button class="ghost" id="bNova">Nova partida</button>
   </section>
@@ -544,13 +550,65 @@ function renderRes() {
   if (R.lliure) f.push(`<div class="fact wide"><span class="k">Esperit lliure</span><span class="v">${esc(R.lliure.p.nom)}</span><span class="s">Qui menys coincideix amb la resta: ${Math.round(R.lliure.avg)}% de mitjana.</span></div>`);
   tb += `<div class="facts">${f.join("")}</div>`;
   $("resTaula").innerHTML = tb;
+  $("resMapa").innerHTML = mapa(R);
   if (!confettiDone) { confettiDone = true; confetti(); }
 }
 document.querySelectorAll(".tabs button").forEach(b => b.onclick = () => {
   document.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-pressed", x === b));
   $("resTu").style.display = b.dataset.t === "tu" ? "flex" : "none";
+  $("resMapa").style.display = b.dataset.t === "mapa" ? "flex" : "none";
   $("resTaula").style.display = b.dataset.t === "taula" ? "flex" : "none";
 });
+
+/* Mapa de la taula: posa cada persona en un pla de manera que les distàncies
+   s'assemblin al que coincideixen (escalat multidimensional clàssic) */
+function mapa(R) {
+  const P = R.P, n = P.length;
+  if (n < 2) return `<div class="block"><p class="why">Calen almenys dues persones per dibuixar el mapa.</p></div>`;
+  const pct = (a, b) => { const x = R.pairs.find(p => (p.a === a && p.b === b) || (p.a === b && p.b === a)); return x ? x.pct : 50; };
+  const D = P.map(a => P.map(b => a === b ? 0 : 1 - pct(a, b) / 100));
+  // B = -1/2 · J · D² · J
+  const D2 = D.map(r => r.map(v => v * v));
+  const rm = D2.map(r => r.reduce((s, v) => s + v, 0) / n), gm = rm.reduce((s, v) => s + v, 0) / n;
+  const B = D2.map((r, i) => r.map((v, j) => -.5 * (v - rm[i] - rm[j] + gm)));
+  const eig = (M, avoid) => {
+    let v = M.map((_, i) => Math.sin(i * 1.7 + 1) + (avoid ? Math.cos(i * 2.3) : 0)), lam = 0;
+    for (let it = 0; it < 200; it++) {
+      if (avoid) { const d = v.reduce((s, x, i) => s + x * avoid[i], 0); v = v.map((x, i) => x - d * avoid[i]); }
+      const w = M.map(r => r.reduce((s, x, j) => s + x * v[j], 0));
+      const nr = Math.hypot(...w) || 1; lam = nr; v = w.map(x => x / nr);
+    }
+    return { v, lam };
+  };
+  const e1 = eig(B), e2 = n > 2 ? eig(B, e1.v) : { v: P.map(() => 0), lam: 0 };
+  let pts = P.map((p, i) => ({ p, x: e1.v[i] * Math.sqrt(Math.max(e1.lam, 0)), y: e2.v[i] * Math.sqrt(Math.max(e2.lam, 0)) }));
+  // encaixa-ho en el dibuix
+  const W = 340, H = 300, pad = 46;
+  const xs = pts.map(q => q.x), ys = pts.map(q => q.y);
+  const span = Math.max(Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys), .01);
+  const sc = Math.min((W - 2 * pad), (H - 2 * pad)) / span;
+  const cx = (Math.max(...xs) + Math.min(...xs)) / 2, cy = (Math.max(...ys) + Math.min(...ys)) / 2;
+  pts.forEach(q => { q.x = W / 2 + (q.x - cx) * sc; q.y = H / 2 + (q.y - cy) * sc; });
+  // separa una mica els que queden un damunt de l'altre perquè es llegeixin els noms
+  for (let it = 0; it < 60; it++) for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) {
+    const a = pts[i], b = pts[j], dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || .01;
+    if (d < 44) { const k = (44 - d) / 2, ux = d > .02 ? dx / d : Math.cos(i + j), uy = d > .02 ? dy / d : Math.sin(i + j); a.x -= ux * k; a.y -= uy * k; b.x += ux * k; b.y += uy * k; }
+  }
+  pts.forEach(q => { q.x = Math.max(pad - 10, Math.min(W - pad + 10, q.x)); q.y = Math.max(24, Math.min(H - 30, q.y)); });
+  let g = "";
+  R.pairs.filter(p => p.pct >= 70).forEach(p => {
+    const a = pts.find(q => q.p === p.a), b = pts.find(q => q.p === p.b);
+    g += `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="#5f9a5b" stroke-width="${2 + (p.pct - 70) / 6}" stroke-linecap="round" opacity="${.35 + (p.pct - 70) / 60}"/>`;
+  });
+  pts.forEach(q => {
+    const me = q.p.id === S.me.id, w = Math.min(120, 14 + q.p.nom.length * 7.4);
+    g += `<circle cx="${q.x}" cy="${q.y}" r="${me ? 11 : 9}" fill="${me ? "#f2b84b" : "#3a1420"}" stroke="#fbf1e1" stroke-width="3"/>`;
+    g += `<rect class="lbl-bg" x="${q.x - w / 2}" y="${q.y + 13}" width="${w}" height="18" rx="9"/>`;
+    g += `<text x="${q.x}" y="${q.y + 26.5}" text-anchor="middle">${esc(q.p.nom)}</text>`;
+  });
+  return `<div class="mapa"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Mapa de la taula: com més a prop, més coincidiu">${g}</svg></div>
+    <p class="llegenda">Com més a prop surten dues persones, més coincideixen. Les línies verdes uneixen les parelles de més del 70%.${n > 2 ? " Tu ets el punt groc." : ""}</p>`;
+}
 
 function confetti() {
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;

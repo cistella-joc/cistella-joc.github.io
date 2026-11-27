@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Afins</title>
+<meta name="description" content="El joc de sobretaula per descobrir qui s'assembla a qui. Cadascú llisca al seu mòbil i al final surten les ànimes bessones de la taula.">
+<meta name="theme-color" content="#3a1420">
+<meta property="og:title" content="Afins · El joc de sobretaula">
+<meta property="og:description" content="Cadascú llisca al seu mòbil i al final surten les ànimes bessones de la taula.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Sobretaula: estovalles de quadres sobre fusta fosca color vi, plats de color crema, mostassa per destacar */
+  --vi: #3a1420;
+  --vi-2: #521c2c;
+  --crema: #fbf1e1;
+  --crema-2: #f1e0c4;
+  --tinta: #2b1418;
+  --mostassa: #f2b84b;
+  --si: #5f9a5b;
+  --no: #d9573f;
+  --display: "Bricolage Grotesque", system-ui, sans-serif;
+  --body: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  font-family: var(--body);
+  color: var(--crema);
+  background-color: var(--vi);
+  background-image:
+    repeating-linear-gradient(0deg, rgba(251,241,225,.045) 0 22px, transparent 22px 44px),
+    repeating-linear-gradient(90deg, rgba(251,241,225,.045) 0 22px, transparent 22px 44px),
+    radial-gradient(ellipse at 50% 0%, #6b2537, var(--vi) 70%);
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+button { font-family: inherit; cursor: pointer; }
+button:focus-visible, input:focus-visible, a:focus-visible { outline: 3px solid var(--mostassa); outline-offset: 3px; }
+#app { height: 100%; max-width: 480px; margin: 0 auto; position: relative; }
+.screen { position: absolute; inset: 0; display: flex; flex-direction: column; gap: 14px; padding: 20px 18px 22px; overflow-y: auto; }
+.screen[hidden] { display: none; }
+.center { align-items: center; text-align: center; justify-content: flex-start; justify-content: safe center; }
+h1, h2, h3 { font-family: var(--display); margin: 0; line-height: 1; text-wrap: balance; }
+.logo { font-size: clamp(64px, 20vw, 92px); font-weight: 800; letter-spacing: -2px; }
+.logo span { color: var(--mostassa); }
+.tag { font-size: 18px; font-weight: 700; margin: 0; max-width: 28ch; color: #f3dcc6; text-wrap: balance; }
+.small { font-size: 13.5px; color: #e2c3b4; margin: 0; line-height: 1.45; max-width: 40ch; }
+.big { border: 0; border-radius: 18px; padding: 16px 26px; font-weight: 800; font-size: 18px; background: var(--mostassa); color: var(--tinta); box-shadow: 0 5px 0 #a8741c; }
+.big:active { transform: translateY(3px); box-shadow: 0 2px 0 #a8741c; }
+.big:disabled { opacity: .45; box-shadow: none; }
+.ghost { border: 2px solid rgba(251,241,225,.35); background: transparent; color: var(--crema); border-radius: 16px; padding: 13px 20px; font-weight: 800; font-size: 16px; }
+.field { display: flex; gap: 8px; width: min(100%, 340px); }
+input[type=text] { flex: 1; min-width: 0; border: 0; border-radius: 14px; padding: 14px; font: inherit; font-weight: 800; font-size: 18px; background: var(--crema); color: var(--tinta); }
+input.code { text-transform: uppercase; letter-spacing: 6px; text-align: center; }
+.plates { display: flex; justify-content: center; gap: 10px; font-size: 44px; filter: drop-shadow(0 6px 10px rgba(0,0,0,.35)); }
+.err { color: #ffb3a3; font-weight: 800; font-size: 14px; min-height: 1em; margin: 0; }
+
+/* Triar joc */
+.decks { display: grid; gap: 10px; width: 100%; }
+.deck { display: grid; grid-template-columns: 54px 1fr; gap: 12px; align-items: center; text-align: left; border: 3px solid transparent; background: var(--crema); color: var(--tinta); border-radius: 18px; padding: 12px 14px; }
+.deck[aria-pressed="true"] { border-color: var(--mostassa); box-shadow: 0 0 0 4px rgba(242,184,75,.35); }
+.deck .e { font-size: 38px; text-align: center; }
+.deck b { display: block; font-family: var(--display); font-size: 20px; }
+.deck small { font-size: 13.5px; color: #6e4b44; font-weight: 700; }
+
+/* Sala d'espera */
+.codebox { background: var(--crema); color: var(--tinta); border-radius: 22px; padding: 14px; display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: center; width: 100%; box-shadow: 0 14px 30px rgba(0,0,0,.35); }
+.codebox #qr { width: 128px; height: 128px; display: grid; place-items: center; background: #fff; border-radius: 12px; padding: 6px; }
+.codebox #qr svg, .codebox #qr img { width: 100%; height: 100%; }
+.codebox .lbl { font-size: 12px; font-weight: 800; color: #6e4b44; text-transform: uppercase; letter-spacing: 1px; }
+.codebox .cd { font-family: var(--display); font-weight: 800; font-size: 46px; letter-spacing: 4px; line-height: 1; }
+.codebox .lnk { font-size: 12.5px; font-weight: 700; color: #6e4b44; word-break: break-all; }
+.copy { margin-top: 6px; border: 0; background: var(--tinta); color: var(--crema); font-weight: 800; font-size: 13px; border-radius: 10px; padding: 7px 10px; }
+.people { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.pp { background: rgba(251,241,225,.12); border: 1px solid rgba(251,241,225,.2); border-radius: 99px; padding: 7px 13px; font-weight: 800; font-size: 15px; display: inline-flex; gap: 6px; align-items: center; }
+.pp.me { background: var(--mostassa); color: var(--tinta); border-color: transparent; }
+.pp.done::after { content: "✓"; color: #9fe39a; }
+.pp.me.done::after { color: var(--tinta); }
+.count { font-family: var(--display); font-size: 22px; font-weight: 800; }
+
+/* Joc */
+.hud { display: flex; justify-content: space-between; align-items: center; font-weight: 800; }
+.hud .brand { font-family: var(--display); font-size: 26px; }
+.hud .brand span { color: var(--mostassa); }
+.bar { height: 7px; border-radius: 7px; background: rgba(251,241,225,.14); overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: var(--mostassa); border-radius: 7px; transition: width .3s; }
+.stage { position: relative; flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; }
+.card { position: absolute; width: min(100%, 360px); height: min(100%, 440px); border-radius: 30px; color: var(--tinta); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 24px; text-align: center; box-shadow: 0 18px 40px rgba(0,0,0,.45), inset 0 0 0 8px rgba(255,255,255,.35); touch-action: none; user-select: none; will-change: transform; }
+.card.back { transform: translateY(14px) scale(.94); filter: brightness(.8); }
+.card.anim { transition: transform .32s cubic-bezier(.2,.8,.3,1), opacity .32s; }
+.card .em { font-size: 112px; line-height: 1; filter: drop-shadow(0 6px 8px rgba(0,0,0,.18)); }
+.card .nm { font-family: var(--display); font-weight: 800; font-size: clamp(30px, 9vw, 40px); line-height: 1.05; text-wrap: balance; }
+.card .ct { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; opacity: .55; }
+.stamp { position: absolute; top: 22px; font-family: var(--display); font-weight: 800; font-size: 26px; padding: 4px 12px; border: 4px solid; border-radius: 12px; opacity: 0; background: rgba(255,255,255,.75); pointer-events: none; }
+.stamp.si { left: 18px; color: var(--si); transform: rotate(-12deg); }
+.stamp.no { right: 18px; color: var(--no); transform: rotate(12deg); }
+.stamp.igual { left: 50%; top: auto; bottom: 22px; transform: translateX(-50%); color: #8a6b5a; }
+.actions { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center; }
+.act { border: 0; border-radius: 18px; padding: 15px 8px; font-weight: 800; font-size: 16px; box-shadow: 0 4px 0 rgba(0,0,0,.35); display: flex; gap: 6px; align-items: center; justify-content: center; }
+.act:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,.35); }
+.act.no { background: var(--no); color: #fff; }
+.act.si { background: var(--si); color: #fff; }
+.act.igual { background: rgba(251,241,225,.14); color: var(--crema); font-size: 13.5px; padding: 15px 12px; }
+.hint { text-align: center; font-size: 12.5px; font-weight: 700; color: #e2c3b4; margin: 0; }
+
+/* Resultats */
+.res { align-items: stretch; }
+.res h2 { font-size: 34px; text-align: center; }
+.block { background: var(--crema); color: var(--tinta); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 12px 26px rgba(0,0,0,.3); }
+.block h3 { font-size: 15px; font-family: var(--body); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #8a5a4e; }
+.pair { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.pair .who { font-family: var(--display); font-weight: 800; font-size: 24px; line-height: 1.1; }
+.pair .pct { font-family: var(--display); font-weight: 800; font-size: 40px; font-variant-numeric: tabular-nums; color: var(--si); }
+.pair.low .pct { color: var(--no); }
+.why { font-size: 14px; font-weight: 700; color: #6e4b44; margin: 0; line-height: 1.4; }
+.rows { display: grid; gap: 8px; }
+.row { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; align-items: center; font-weight: 800; }
+.row .track { grid-column: 1 / -1; height: 9px; background: var(--crema-2); border-radius: 9px; overflow: hidden; }
+.row .track i { display: block; height: 100%; border-radius: 9px; background: var(--si); }
+.row span:last-of-type { font-variant-numeric: tabular-nums; }
+.facts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.fact { background: var(--crema); color: var(--tinta); border-radius: 18px; padding: 12px; display: flex; flex-direction: column; gap: 4px; }
+.fact .k { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .8px; color: #8a5a4e; }
+.fact .v { font-family: var(--display); font-weight: 800; font-size: 19px; line-height: 1.15; }
+.fact .s { font-size: 13px; font-weight: 700; color: #6e4b44; }
+.fact.wide { grid-column: 1 / -1; }
+.tabs { display: flex; gap: 6px; justify-content: center; }
+.tabs button { border: 0; border-radius: 99px; padding: 9px 16px; font-weight: 800; font-size: 15px; background: rgba(251,241,225,.12); color: var(--crema); }
+.tabs button[aria-pressed="true"] { background: var(--mostassa); color: var(--tinta); }
+.confetti { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
+@media (prefers-reduced-motion: reduce) { .card.anim, .bar i { transition: none; } }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- Inici -->
+  <section class="screen center" id="s-inici">
+    <div class="plates" aria-hidden="true"><span>🍷</span><span>🍰</span><span>☕</span></div>
+    <h1 class="logo">Afins<span>.</span></h1>
+    <p class="tag">El joc de sobretaula per descobrir qui s'assembla a qui.</p>
+    <p class="small">Cadascú llisca 20 targetes al seu mòbil: m'agrada o no. Al final surten les ànimes bessones de la taula, i qui no coincideix amb ningú.</p>
+    <button class="big" id="bCrea">Crea una partida</button>
+    <p class="small" style="margin-top:6px">Algú ja n'ha creat una? Escriu el codi:</p>
+    <form class="field" id="fCodi">
+      <input type="text" class="code" id="iCodi" maxlength="4" autocomplete="off" aria-label="Codi de la partida" placeholder="CODI">
+      <button class="big" type="submit" style="padding:14px 18px">Entra</button>
+    </form>
+    <p class="err" id="eCodi" role="status"></p>
+  </section>
+
+  <!-- Triar joc -->
+  <section class="screen" id="s-tria">
+    <h2 style="font-size:32px">Tria les targetes</h2>
+    <div class="decks" id="decks"></div>
+    <button class="big" id="bTria">Continua</button>
+    <button class="ghost" data-go="s-inici">Enrere</button>
+  </section>
+
+  <!-- Nom -->
+  <section class="screen center" id="s-nom">
+    <div class="plates" aria-hidden="true"><span>🙋</span></div>
+    <h2 style="font-size:32px">Com et dius?</h2>
+    <p class="small" id="nomInfo">Així sabran qui és qui als resultats.</p>
+    <form class="field" id="fNom">
+      <input type="text" id="iNom" maxlength="16" autocomplete="nickname" aria-label="El teu nom" placeholder="El teu nom">
+      <button class="big" type="submit" style="padding:14px 18px">Som-hi</button>
+    </form>
+    <p class="err" id="eNom" role="status"></p>
+  </section>
+
+  <!-- Sala d'espera -->
+  <section class="screen center" id="s-sala">
+    <div class="codebox">
+      <div id="qr" aria-label="Codi QR per entrar a la partida"></div>
+      <div style="text-align:left">
+        <div class="lbl">Codi de la partida</div>
+        <div class="cd" id="salaCodi">····</div>
+        <div class="lnk" id="salaLink"></div>
+        <button class="copy" id="bCopia">Copia l'enllaç</button>
+      </div>
+    </div>
+    <div class="count" id="salaCount">A taula: 0</div>
+    <div class="people" id="salaPeople"></div>
+    <p class="small" id="salaInfo"></p>
+    <button class="big" id="bComenca" hidden>Comença</button>
+  </section>
+
+  <!-- Joc -->
+  <section class="screen" id="s-joc">
+    <div class="hud"><div class="brand">Afins<span>.</span></div><div id="jocN">1/20</div></div>
+    <div class="bar"><i id="jocBar"></i></div>
+    <div class="stage" id="stage"></div>
+    <div class="actions">
+      <button class="act no" id="bNo" aria-label="No m'agrada">✕ No</button>
+      <button class="act igual" id="bIgual" aria-label="Ni fu ni fa">Ni fu ni fa</button>
+      <button class="act si" id="bSi" aria-label="M'agrada">♥ M'agrada</button>
+    </div>
+    <p class="hint">Llisca a la dreta si t'agrada i a l'esquerra si no.</p>
+  </section>
+
+  <!-- Esperant la resta -->
+  <section class="screen center" id="s-fet">
+    <div class="plates" aria-hidden="true"><span>⏳</span></div>
+    <h2 style="font-size:34px">Fet!</h2>
+    <p class="tag" id="fetInfo">Esperant la resta de la taula…</p>
+    <div class="people" id="fetPeople"></div>
+    <button class="big" id="bResultats" hidden>Mostra els resultats ara</button>
+    <p class="small" id="fetHost"></p>
+  </section>
+
+  <!-- Resultats -->
+  <section class="screen res" id="s-res">
+    <h2>Resultats</h2>
+    <div class="tabs"><button data-t="tu" aria-pressed="true">Tu</button><button data-t="taula" aria-pressed="false">Tota la taula</button></div>
+    <div id="resTu" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div id="resTaula" style="display:none;flex-direction:column;gap:12px"></div>
+    <button class="ghost" id="bNova">Nova partida</button>
+  </section>
+</div>
+
+<script src="qrcode.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+/* ------------------ Targetes ------------------ */
+const DECKS = {
+  tot: { nom: "De tot una mica", e: "🎲", d: "Manies, plans i petits plaers de cada dia", cartes: [
+    ["Matinar", "🌅"], ["La pizza amb pinya", "🍍"], ["Els gats", "🐈"], ["Els gossos", "🐕"], ["El karaoke", "🎤"],
+    ["Viatjar sol", "🧳"], ["Les pel·lis de por", "👻"], ["Els jocs de taula", "🎲"], ["La migdiada", "😴"], ["Anar d'acampada", "⛺"],
+    ["El fred", "🥶"], ["La calor", "🥵"], ["Ballar", "💃"], ["Les sorpreses", "🎁"], ["El futbol", "⚽"],
+    ["Les xarxes socials", "📱"], ["Cuinar", "🧑‍🍳"], ["Les festes majors", "🎉"], ["Llegir al llit", "📚"], ["La platja", "🏖️"],
+    ["La muntanya", "⛰️"], ["Fer esport", "🏃"], ["Els castells", "🧗"], ["Les sèries de maratons", "📺"]
+  ] },
+  musica: { nom: "Música", e: "🎶", d: "Estils, grups i cançons que fan ballar o fugir", cartes: [
+    ["El reggaeton", "🔥"], ["El rock", "🎸"], ["La rumba catalana", "👏"], ["El jazz", "🎷"], ["La música clàssica", "🎻"],
+    ["L'electrònica", "🎧"], ["El trap", "🧢"], ["Les havaneres", "⛵"], ["El rap en català", "🎙️"], ["El flamenc", "💃"],
+    ["El heavy metal", "🤘"], ["L'indie", "🎹"], ["Les sardanes", "⭕"], ["La música dels 80", "📼"], ["La salsa", "🌶️"],
+    ["Els festivals", "🎪"], ["Cantar a la dutxa", "🚿"], ["Els concerts petits", "🍺"], ["Les orquestres de festa major", "🎺"], ["El K-pop", "💜"],
+    ["La cançó d'autor", "📝"], ["Les bandes sonores", "🎬"], ["El country", "🤠"], ["El ska", "🕺"]
+  ] },
+  taula: { nom: "A taula", e: "🍽️", d: "Plats, gustos i manies de taula", cartes: [
+    ["Els calçots", "🧅"], ["Els cargols", "🐌"], ["El coriandre", "🌿"], ["El formatge blau", "🧀"], ["La xocolata negra", "🍫"],
+    ["El menjar picant", "🌶️"], ["El sushi", "🍣"], ["El fetge", "🥩"], ["Les ostres", "🦪"], ["La crema catalana", "🍮"],
+    ["Els panellets", "🌰"], ["El cafè sol", "☕"], ["El vi negre", "🍷"], ["La cervesa", "🍺"], ["El gintònic", "🍸"],
+    ["La ratafia", "🥃"], ["Les carxofes", "🥬"], ["Els musclos", "🐚"], ["La truita amb ceba", "🍳"], ["El menjar ràpid", "🍔"],
+    ["Esmorzar de forquilla", "🍴"], ["Les postres de músic", "🥜"], ["La fruita a les postres", "🍉"], ["Sopar tard", "🌙"]
+  ] },
+  lleure: { nom: "Lleure i plans", e: "🗺️", d: "Com t'agrada passar el temps lliure", cartes: [
+    ["Els museus", "🏛️"], ["Les escapades rurals", "🏡"], ["Les ciutats grans", "🌆"], ["Els creuers", "🚢"], ["Les rutes en bici", "🚴"],
+    ["El teatre", "🎭"], ["El cinema a la sala", "🍿"], ["Els parcs temàtics", "🎢"], ["Anar a buscar bolets", "🍄"], ["La pesca", "🎣"],
+    ["L'esquí", "⛷️"], ["El pàdel", "🎾"], ["Els videojocs", "🎮"], ["Fer fotos", "📷"], ["Els mercats ambulants", "🧺"],
+    ["Fer el vermut", "🫒"], ["Els concerts a l'estiu", "🎵"], ["Fer voluntariat", "🤝"], ["L'hort", "🥕"], ["El ioga", "🧘"],
+    ["Les sobretaules llargues", "⏳"], ["Els viatges organitzats", "🚌"], ["Dormir fora de casa", "🛏️"], ["Els plans improvisats", "⚡"]
+  ] }
+};
+const COLORS = ["#f7c9a8", "#c9e2bf", "#f4d58d", "#cfd8f2", "#f2c2c9", "#d9cbea", "#bfe3dd", "#f6d1b0"];
+
+/* ------------------ Firebase ------------------ */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCrGi81dW1USnsRPlUddDNVPck-zQZxt20",
+  authDomain: "cistella-b671a.firebaseapp.com",
+  projectId: "cistella-b671a",
+  storageBucket: "cistella-b671a.firebasestorage.app",
+  messagingSenderId: "204191160309",
+  appId: "1:204191160309:web:d932a10754e1334615f2bc"
+};
+let db = null;
+try { firebase.initializeApp(FIREBASE_CONFIG); db = firebase.firestore(); } catch (e) { db = null; }
+const TS = () => firebase.firestore.FieldValue.serverTimestamp();
+const salaRef = c => db.collection("sales").doc(c);
+
+/* ------------------ Estat ------------------ */
+const $ = id => document.getElementById(id);
+const esc = t => String(t).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+let S = { codi: null, deck: "tot", me: null, host: false, sala: null, jugadors: [], resp: "", i: 0, unsub: [] };
+const LETTERS = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+
+function show(id) {
+  document.querySelectorAll(".screen").forEach(s => s.hidden = s.id !== id);
+  const s = $(id); s.scrollTop = 0;
+}
+document.querySelectorAll("[data-go]").forEach(b => b.onclick = () => show(b.dataset.go));
+function saveMe() { try { localStorage.setItem("afins-" + S.codi, JSON.stringify({ id: S.me.id, nom: S.me.nom, host: S.host })); } catch (e) {} }
+function loadMe(c) { try { return JSON.parse(localStorage.getItem("afins-" + c) || "null"); } catch (e) { return null; } }
+function linkSala(c) { return location.origin + location.pathname + "#" + c; }
+function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function cartaOf(idx) { const d = DECKS[S.sala.deck]; const [nm, em] = d.cartes[idx]; return { nm, em, ct: d.nom }; }
+
+/* ------------------ Inici ------------------ */
+$("decks").innerHTML = Object.entries(DECKS).map(([k, d]) => `<button class="deck" data-k="${k}" aria-pressed="${k === S.deck}"><span class="e" aria-hidden="true">${d.e}</span><span><b>${d.nom}</b><small>${d.d}</small></span></button>`).join("");
+document.querySelectorAll(".deck").forEach(b => b.onclick = () => { S.deck = b.dataset.k; document.querySelectorAll(".deck").forEach(x => x.setAttribute("aria-pressed", x === b)); });
+$("bCrea").onclick = () => show("s-tria");
+$("bTria").onclick = () => { S.host = true; S.codi = null; $("nomInfo").textContent = "Ets qui obre la partida: tu decidiràs quan comença."; show("s-nom"); };
+
+$("fCodi").addEventListener("submit", async e => {
+  e.preventDefault();
+  const c = $("iCodi").value.trim().toUpperCase();
+  if (!/^[A-Z]{4}$/.test(c)) { $("eCodi").textContent = "El codi té 4 lletres."; return; }
+  await entraCodi(c);
+});
+async function entraCodi(c) {
+  $("eCodi").textContent = "";
+  if (!db) { $("eCodi").textContent = "No hi ha connexió. Torna-ho a provar."; show("s-inici"); return; }
+  const snap = await salaRef(c).get().catch(() => null);
+  if (!snap || !snap.exists) { $("eCodi").textContent = `No hi ha cap partida amb el codi ${c}.`; show("s-inici"); return; }
+  S.codi = c; S.host = false;
+  const prev = loadMe(c);
+  if (prev) { S.me = { id: prev.id, nom: prev.nom }; S.host = !!prev.host; return obre(); }
+  $("nomInfo").textContent = "Així sabran qui és qui als resultats.";
+  show("s-nom");
+}
+
+$("fNom").addEventListener("submit", async e => {
+  e.preventDefault();
+  const nom = $("iNom").value.trim().replace(/\s+/g, " ").slice(0, 16);
+  if (!nom) { $("eNom").textContent = "Escriu el teu nom."; return; }
+  if (!db) { $("eNom").textContent = "No hi ha connexió. Torna-ho a provar."; return; }
+  $("eNom").textContent = "";
+  try { localStorage.setItem("afins-nom", nom); } catch (e) {}
+  if (S.host && !S.codi) {
+    // crea la sala amb un codi lliure
+    const d = DECKS[S.deck];
+    const cartes = shuffle([...d.cartes.keys()]).slice(0, 20);
+    for (let k = 0; k < 6; k++) {
+      const c = Array.from({ length: 4 }, () => LETTERS[Math.floor(Math.random() * LETTERS.length)]).join("");
+      const ex = await salaRef(c).get().catch(() => null);
+      if (ex && !ex.exists) {
+        try { await salaRef(c).set({ deck: S.deck, cartes, estat: "espera", creada: TS() }); S.codi = c; break; }
+        catch (err) { /* codi ocupat entre mig: prova'n un altre */ }
+      }
+    }
+    if (!S.codi) { $("eNom").textContent = "No s'ha pogut crear la partida. Torna-ho a provar."; return; }
+  }
+  const id = Math.random().toString(36).slice(2, 12);
+  try { await salaRef(S.codi).collection("jugadors").doc(id).set({ nom, resp: "", fet: false, t: TS() }); }
+  catch (err) { $("eNom").textContent = "No s'ha pogut entrar a la partida."; return; }
+  S.me = { id, nom };
+  saveMe();
+  obre();
+});
+try { $("iNom").value = localStorage.getItem("afins-nom") || ""; } catch (e) {}
+
+/* ------------------ Sala ------------------ */
+function obre() {
+  S.unsub.forEach(u => u()); S.unsub = [];
+  if (location.hash.slice(1) !== S.codi) history.replaceState(null, "", "#" + S.codi);
+  S.unsub.push(salaRef(S.codi).onSnapshot(s => { if (!s.exists) return; S.sala = s.data(); render(); }));
+  S.unsub.push(salaRef(S.codi).collection("jugadors").onSnapshot(q => {
+    S.jugadors = []; q.forEach(d => S.jugadors.push({ id: d.id, ...d.data() }));
+    S.jugadors.sort((a, b) => (a.t?.seconds || a.t || 0) - (b.t?.seconds || b.t || 0));
+    const me = S.jugadors.find(j => j.id === S.me.id);
+    if (me && S.resp === "" && me.resp) { S.resp = me.resp; S.i = me.resp.length; }
+    render();
+  }));
+}
+
+let lastScreen = null;
+function render() {
+  if (!S.sala || !S.me) return;
+  const est = S.sala.estat, me = S.jugadors.find(j => j.id === S.me.id);
+  const total = S.sala.cartes.length, fets = S.jugadors.filter(j => j.fet).length;
+  let target;
+  if (est === "resultats") target = "s-res";
+  else if (est === "jugant") target = (me && me.fet) || S.i >= total ? "s-fet" : "s-joc";
+  else target = "s-sala";
+  if (target !== lastScreen) {
+    show(target); lastScreen = target;
+    if (target === "s-joc") renderCards();
+    if (target === "s-res") renderRes();
+  }
+  if (target === "s-sala") {
+    $("salaCodi").textContent = S.codi;
+    $("salaLink").textContent = linkSala(S.codi).replace(/^https?:\/\//, "");
+    drawQR();
+    $("salaCount").textContent = `A taula: ${S.jugadors.length}`;
+    $("salaPeople").innerHTML = S.jugadors.map(j => `<span class="pp ${j.id === S.me.id ? "me" : ""}">${esc(j.nom)}</span>`).join("");
+    $("bComenca").hidden = !S.host;
+    $("bComenca").disabled = S.jugadors.length < 2;
+    $("salaInfo").textContent = S.host
+      ? (S.jugadors.length < 2 ? "Ensenya el QR a la resta de la taula. Quan hi hagi almenys dues persones, ja podreu començar." : "Quan hi sigui tothom, prem Comença.")
+      : "Esperant que qui ha creat la partida la comenci…";
+  }
+  if (target === "s-fet") {
+    $("fetInfo").textContent = fets >= S.jugadors.length ? "Ja hi sou tots!" : `Esperant la resta de la taula: ${fets} de ${S.jugadors.length} han acabat.`;
+    $("fetPeople").innerHTML = S.jugadors.map(j => `<span class="pp ${j.id === S.me.id ? "me" : ""} ${j.fet ? "done" : ""}">${esc(j.nom)}</span>`).join("");
+    $("bResultats").hidden = !S.host;
+    $("bResultats").disabled = fets < 2;
+    $("fetHost").textContent = S.host ? "Si algú s'ha despistat, pots mostrar els resultats sense esperar-lo." : "";
+    // quan tothom ha acabat, qui ha obert la partida mostra els resultats
+    if (S.host && fets >= 2 && fets === S.jugadors.length) salaRef(S.codi).update({ estat: "resultats" }).catch(() => {});
+  }
+  if (target === "s-res") renderRes();
+}
+function drawQR() {
+  if ($("qr").dataset.c === S.codi) return;
+  const qr = qrcode(0, "M"); qr.addData(linkSala(S.codi)); qr.make();
+  $("qr").innerHTML = qr.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
+  $("qr").dataset.c = S.codi;
+}
+$("bCopia").onclick = async () => {
+  try { await navigator.clipboard.writeText(linkSala(S.codi)); $("bCopia").textContent = "Copiat!"; }
+  catch (e) { $("bCopia").textContent = "Copia'l a mà"; }
+  setTimeout(() => $("bCopia").textContent = "Copia l'enllaç", 1800);
+};
+$("bComenca").onclick = () => salaRef(S.codi).update({ estat: "jugant" }).catch(() => {});
+$("bResultats").onclick = () => salaRef(S.codi).update({ estat: "resultats" }).catch(() => {});
+$("bNova").onclick = () => { S.unsub.forEach(u => u()); S = { codi: null, deck: S.deck, me: null, host: false, sala: null, jugadors: [], resp: "", i: 0, unsub: [] }; lastScreen = null; history.replaceState(null, "", location.pathname); show("s-inici"); };
+
+/* ------------------ Joc ------------------ */
+function cardEl(idx, pos, back) {
+  const c = cartaOf(S.sala.cartes[idx]);
+  const el = document.createElement("div");
+  el.className = "card" + (back ? " back" : "");
+  el.style.background = COLORS[(pos * 3 + S.sala.cartes[idx]) % COLORS.length];
+  el.innerHTML = `<div class="stamp si">M'AGRADA</div><div class="stamp no">NO</div><div class="stamp igual">NI FU NI FA</div>
+    <div class="ct">${esc(c.ct)}</div><div class="em" aria-hidden="true">${c.em}</div><div class="nm">${esc(c.nm)}</div>`;
+  if (back) el.setAttribute("aria-hidden", "true");
+  return el;
+}
+function renderCards() {
+  const st = $("stage"), total = S.sala.cartes.length;
+  st.innerHTML = "";
+  if (S.i >= total) return;
+  if (S.i + 1 < total) st.appendChild(cardEl(S.i + 1, S.i + 1, true));
+  const c = cardEl(S.i, S.i, false);
+  st.appendChild(c); drag(c);
+  $("jocN").textContent = `${S.i + 1}/${total}`;
+  $("jocBar").style.width = (S.i / total * 100) + "%";
+  busy = false;
+}
+let busy = false;
+function drag(card) {
+  let x0 = 0, y0 = 0, dx = 0, dy = 0, on = false;
+  const st = k => card.querySelector(".stamp." + k);
+  card.addEventListener("pointerdown", e => { if (busy) return; on = true; x0 = e.clientX; y0 = e.clientY; dx = dy = 0; card.classList.remove("anim"); card.setPointerCapture(e.pointerId); });
+  card.addEventListener("pointermove", e => {
+    if (!on) return;
+    dx = e.clientX - x0; dy = e.clientY - y0;
+    card.style.transform = `translate(${dx}px,${dy * .5}px) rotate(${dx / 18}deg)`;
+    st("si").style.opacity = Math.max(0, Math.min(1, dx / 100));
+    st("no").style.opacity = Math.max(0, Math.min(1, -dx / 100));
+    st("igual").style.opacity = Math.max(0, Math.min(1, (-dy - Math.abs(dx)) / 100));
+  });
+  const up = () => {
+    if (!on) return; on = false;
+    if (dx > 100) vota("1"); else if (dx < -100) vota("0"); else if (dy < -110) vota("-");
+    else { card.classList.add("anim"); card.style.transform = ""; ["si", "no", "igual"].forEach(k => st(k).style.opacity = 0); }
+  };
+  card.addEventListener("pointerup", up); card.addEventListener("pointercancel", up);
+}
+function vota(v) {
+  if (busy) return; busy = true;
+  const card = $("stage").querySelector(".card:not(.back)");
+  const k = v === "1" ? "si" : v === "0" ? "no" : "igual";
+  card.querySelector(".stamp." + k).style.opacity = 1;
+  card.classList.add("anim");
+  card.style.transform = v === "-" ? "translate(0,-640px)" : `translate(${v === "1" ? 560 : -560}px, 30px) rotate(${v === "1" ? 22 : -22}deg)`;
+  card.style.opacity = "0";
+  const back = $("stage").querySelector(".card.back"); if (back) { back.classList.add("anim"); back.classList.remove("back"); }
+  S.resp += v; S.i++;
+  const total = S.sala.cartes.length, fet = S.i >= total;
+  salaRef(S.codi).collection("jugadors").doc(S.me.id).update(fet ? { resp: S.resp, fet: true } : { resp: S.resp }).catch(() => {});
+  setTimeout(() => { if (fet) render(); else renderCards(); }, 230);
+}
+$("bSi").onclick = () => vota("1");
+$("bNo").onclick = () => vota("0");
+$("bIgual").onclick = () => vota("-");
+document.addEventListener("keydown", e => {
+  if ($("s-joc").hidden) return;
+  if (e.key === "ArrowRight") vota("1"); else if (e.key === "ArrowLeft") vota("0"); else if (e.key === "ArrowUp") vota("-");
+});
+
+/* ------------------ Resultats ------------------ */
+function sim(a, b) {
+  let n = 0, same = 0, likes = [];
+  for (let i = 0; i < Math.min(a.resp.length, b.resp.length); i++) {
+    const x = a.resp[i], y = b.resp[i];
+    if ((x === "1" || x === "0") && (y === "1" || y === "0")) { n++; if (x === y) { same++; if (x === "1") likes.push(i); } }
+  }
+  return { n, pct: n ? Math.round(100 * same / n) : 0, likes };
+}
+function calc() {
+  const P = S.jugadors.filter(j => j.resp && j.resp.length >= 3);
+  const pairs = [];
+  for (let i = 0; i < P.length; i++) for (let j = i + 1; j < P.length; j++) {
+    const s = sim(P[i], P[j]); if (s.n >= 3) pairs.push({ a: P[i], b: P[j], ...s });
+  }
+  pairs.sort((x, y) => y.pct - x.pct || y.likes.length - x.likes.length);
+  const total = S.sala.cartes.length, cards = [];
+  for (let i = 0; i < total; i++) {
+    let si = 0, no = 0;
+    P.forEach(p => { if (p.resp[i] === "1") si++; else if (p.resp[i] === "0") no++; });
+    cards.push({ i, si, no, n: si + no });
+  }
+  const valid = cards.filter(c => c.n >= 2);
+  const fav = valid.slice().sort((a, b) => b.si / b.n - a.si / a.n || b.si - a.si)[0];
+  const odi = valid.slice().sort((a, b) => b.no / b.n - a.no / a.n || b.no - a.no)[0];
+  const div = valid.filter(c => c.si > 0 && c.no > 0).sort((a, b) => Math.abs(a.si - a.no) / a.n - Math.abs(b.si - b.no) / b.n || b.n - a.n)[0];
+  let lliure = null;
+  if (P.length >= 3) {
+    lliure = P.map(p => { const ps = pairs.filter(x => x.a === p || x.b === p); return { p, avg: ps.length ? ps.reduce((s, x) => s + x.pct, 0) / ps.length : 100 }; })
+      .sort((a, b) => a.avg - b.avg)[0];
+  }
+  return { P, pairs, fav, odi, div, lliure };
+}
+const nomCarta = idx => cartaOf(S.sala.cartes[idx]);
+function shared(likes) { return likes.slice(0, 3).map(i => { const c = nomCarta(i); return `${c.em} ${esc(c.nm.toLowerCase())}`; }).join(", "); }
+
+let confettiDone = false;
+function renderRes() {
+  const R = calc(), me = R.P.find(p => p.id === S.me.id);
+  // Tu
+  let tu = "";
+  if (me) {
+    const mine = R.pairs.filter(x => x.a === me || x.b === me).map(x => ({ o: x.a === me ? x.b : x.a, pct: x.pct, likes: x.likes }))
+      .sort((a, b) => b.pct - a.pct);
+    if (mine.length) {
+      const best = mine[0], worst = mine[mine.length - 1];
+      tu += `<div class="block"><h3>La teva ànima bessona</h3><div class="pair"><div class="who">${esc(best.o.nom)}</div><div class="pct">${best.pct}%</div></div>
+        ${best.likes.length ? `<p class="why">Us agrada a tots dos: ${shared(best.likes)}.</p>` : ""}</div>`;
+      if (mine.length > 1) tu += `<div class="block"><h3>El teu polo oposat</h3><div class="pair low"><div class="who">${esc(worst.o.nom)}</div><div class="pct">${worst.pct}%</div></div></div>`;
+      tu += `<div class="block"><h3>Amb tota la taula</h3><div class="rows">${mine.map(m => `<div class="row"><span>${esc(m.o.nom)}</span><span>${m.pct}%</span><div class="track"><i style="width:${m.pct}%"></i></div></div>`).join("")}</div></div>`;
+    } else tu = `<div class="block"><p class="why">Encara no hi ha prou respostes per comparar.</p></div>`;
+  } else tu = `<div class="block"><p class="why">No vas arribar a respondre prou targetes per sortir als resultats.</p></div>`;
+  $("resTu").innerHTML = tu;
+  // Taula
+  let tb = "";
+  if (R.pairs.length) {
+    const top = R.pairs.slice(0, 3);
+    tb += `<div class="block"><h3>Ànimes bessones</h3>${top.map(p => `<div class="pair"><div class="who">${esc(p.a.nom)} & ${esc(p.b.nom)}</div><div class="pct">${p.pct}%</div></div>`).join("")}</div>`;
+    const low = R.pairs[R.pairs.length - 1];
+    if (R.pairs.length > 1) tb += `<div class="block"><h3>Polos oposats</h3><div class="pair low"><div class="who">${esc(low.a.nom)} & ${esc(low.b.nom)}</div><div class="pct">${low.pct}%</div></div></div>`;
+  }
+  const f = [];
+  if (R.fav) { const c = nomCarta(R.fav.i); f.push(`<div class="fact"><span class="k">${R.fav.si === R.fav.n ? "A tothom li agrada" : "El que més agrada"}</span><span class="v">${c.em} ${esc(c.nm)}</span><span class="s">${R.fav.si} de ${R.fav.n}</span></div>`); }
+  if (R.odi && R.odi.no > 0) { const c = nomCarta(R.odi.i); f.push(`<div class="fact"><span class="k">${R.odi.no === R.odi.n ? "Ningú ho vol" : "El que menys agrada"}</span><span class="v">${c.em} ${esc(c.nm)}</span><span class="s">${R.odi.no} de ${R.odi.n} diuen que no</span></div>`); }
+  if (R.div) { const c = nomCarta(R.div.i); f.push(`<div class="fact wide"><span class="k">La gran discussió</span><span class="v">${c.em} ${esc(c.nm)}</span><span class="s">${R.div.si} a favor i ${R.div.no} en contra. Debat obert!</span></div>`); }
+  if (R.lliure) f.push(`<div class="fact wide"><span class="k">Esperit lliure</span><span class="v">${esc(R.lliure.p.nom)}</span><span class="s">Qui menys coincideix amb la resta: ${Math.round(R.lliure.avg)}% de mitjana.</span></div>`);
+  tb += `<div class="facts">${f.join("")}</div>`;
+  $("resTaula").innerHTML = tb;
+  if (!confettiDone) { confettiDone = true; confetti(); }
+}
+document.querySelectorAll(".tabs button").forEach(b => b.onclick = () => {
+  document.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-pressed", x === b));
+  $("resTu").style.display = b.dataset.t === "tu" ? "flex" : "none";
+  $("resTaula").style.display = b.dataset.t === "taula" ? "flex" : "none";
+});
+
+function confetti() {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const c = document.createElement("canvas"); c.className = "confetti"; document.body.appendChild(c);
+  const d = devicePixelRatio || 1; c.width = innerWidth * d; c.height = innerHeight * d;
+  const x = c.getContext("2d"); x.scale(d, d);
+  const cols = ["#f2b84b", "#fbf1e1", "#5f9a5b", "#d9573f", "#f7c9a8"];
+  const ps = Array.from({ length: 90 }, () => ({ x: Math.random() * innerWidth, y: -20 - Math.random() * innerHeight * .5, vx: (Math.random() - .5) * 2, vy: 2 + Math.random() * 3, r: Math.random() * 6.28, c: cols[Math.floor(Math.random() * cols.length)] }));
+  let t = 0;
+  (function f() {
+    x.clearRect(0, 0, innerWidth, innerHeight);
+    ps.forEach(p => { p.x += p.vx; p.y += p.vy; p.r += .1; x.save(); x.translate(p.x, p.y); x.rotate(p.r); x.fillStyle = p.c; x.fillRect(-4, -2, 8, 4); x.restore(); });
+    if (++t < 200) requestAnimationFrame(f); else c.remove();
+  })();
+}
+
+/* ------------------ Arrencada ------------------ */
+const h = location.hash.slice(1).toUpperCase();
+if (/^[A-Z]{4}$/.test(h)) entraCodi(h); else show("s-inici");
+</script>
+</body>
+</html>

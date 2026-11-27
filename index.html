@@ -239,8 +239,11 @@ button:focus-visible { outline: 3px solid var(--rovello); outline-offset: 3px; }
 .tabs button { border: 0; border-radius: 99px; padding: 7px 14px; font-weight: 800; font-size: 13.5px; background: rgba(247,236,214,.1); color: var(--crema); }
 .tabs button[aria-pressed="true"] { background: var(--rovello); color: #2a1608; }
 .rlist { list-style: none; margin: 0; padding: 0; width: 100%; display: grid; gap: 6px; counter-reset: r; }
-.rlist li { counter-increment: r; display: grid; grid-template-columns: 30px 1fr auto; align-items: center; gap: 8px; background: rgba(247,236,214,.07); border: 1px solid rgba(247,236,214,.12); border-radius: 12px; padding: 9px 12px; font-size: 15px; }
-.rlist li::before { content: counter(r); font-family: var(--display); font-weight: 800; font-size: 18px; color: #c9a24a; }
+.rlist li { display: grid; grid-template-columns: 30px 1fr auto; align-items: center; gap: 8px; background: rgba(247,236,214,.07); border: 1px solid rgba(247,236,214,.12); border-radius: 12px; padding: 9px 12px; font-size: 15px; }
+.rlist .pos { font-family: var(--display); font-weight: 800; font-size: 18px; color: #c9a24a; font-variant-numeric: tabular-nums; }
+.rlist .gap { display: block; text-align: center; color: #c9d2b4; border: 0; background: none; padding: 0; letter-spacing: 4px; }
+.rlist .mypos { display: block; text-align: center; font-weight: 800; color: var(--crema); background: none; border: 0; padding: 4px 0 0; }
+.more { align-self: center; border: 2px solid rgba(247,236,214,.3); background: none; color: var(--crema); font-weight: 800; font-size: 15px; border-radius: 14px; padding: 10px 18px; }
 .rlist li.me { border-color: var(--rovello); background: rgba(224,122,46,.15); }
 .rlist b { font-variant-numeric: tabular-nums; font-family: var(--display); font-size: 18px; }
 .rlist .empty { display: block; color: #c9d2b4; }
@@ -351,6 +354,7 @@ button:focus-visible { outline: 3px solid var(--rovello); outline-offset: 3px; }
       <button data-t="local" aria-pressed="false" data-i18n="tabLocal">Aquest mòbil</button>
     </div>
     <ol class="rlist" id="rlist"></ol>
+    <button class="more" id="btnMore" hidden data-i18n="loadMore">Carrega'n més</button>
     <button class="big" id="btnRankClose" data-i18n="close">Tanca</button>
   </section>
 
@@ -438,7 +442,8 @@ const I18N = {
     publicDomain: "Domini públic", creditCC0: "domini públic (CC0)", originalAt: "foto original a",
     illusNote: "Els bolets sense foto es mostren amb il·lustracions pròpies del joc.",
     allIllus: "Totes les imatges d'aquesta versió són il·lustracions pròpies del joc.",
-    langLabel: "Idioma", itch: "Valora'l a itch.io", itchNote: "Si t'ha agradat, deixa-hi una valoració o un comentari: ajuda molt que el joc arribi a més gent."
+    langLabel: "Idioma", itch: "Valora'l a itch.io", itchNote: "Si t'ha agradat, deixa-hi una valoració o un comentari: ajuda molt que el joc arribi a més gent.",
+    loadMore: "Carrega'n més", yourPos: (p, n) => `Ets el número ${p} de ${n}`, savedPos: (p, n) => `Desat! Ets el número ${p} de ${n}.`, yourBest: "La teva millor puntuació"
   },
   es: {
     lives: "Vidas", points: "puntos", hits: "aciertos", record: "récord",
@@ -494,7 +499,8 @@ const I18N = {
     publicDomain: "Dominio público", creditCC0: "dominio público (CC0)", originalAt: "foto original en",
     illusNote: "Las setas sin foto se muestran con ilustraciones propias del juego.",
     allIllus: "Todas las imágenes de esta versión son ilustraciones propias del juego.",
-    langLabel: "Idioma", itch: "Valóralo en itch.io", itchNote: "Si te ha gustado, deja una valoración o un comentario: ayuda mucho a que el juego llegue a más gente."
+    langLabel: "Idioma", itch: "Valóralo en itch.io", itchNote: "Si te ha gustado, deja una valoración o un comentario: ayuda mucho a que el juego llegue a más gente.",
+    loadMore: "Cargar más", yourPos: (p, n) => `Eres el número ${p} de ${n}`, savedPos: (p, n) => `¡Guardado! Eres el número ${p} de ${n}.`, yourBest: "Tu mejor puntuación"
   },
   en: {
     lives: "Lives", points: "points", hits: "correct", record: "best",
@@ -550,7 +556,8 @@ const I18N = {
     publicDomain: "Public domain", creditCC0: "public domain (CC0)", originalAt: "original photo on",
     illusNote: "Mushrooms without a photo are shown with the game's own illustrations.",
     allIllus: "All the images in this version are the game's own illustrations.",
-    langLabel: "Language", itch: "Rate it on itch.io", itchNote: "If you enjoyed it, leave a rating or a comment: it really helps the game reach more people."
+    langLabel: "Language", itch: "Rate it on itch.io", itchNote: "If you enjoyed it, leave a rating or a comment: it really helps the game reach more people.",
+    loadMore: "Load more", yourPos: (p, n) => `You're number ${p} of ${n}`, savedPos: (p, n) => `Saved! You're number ${p} of ${n}.`, yourBest: "Your best score"
   }
 };
 
@@ -1521,6 +1528,42 @@ async function globalRank() {
   const snap = await db.collection("ranking").orderBy("punts", "desc").limit(30).get();
   return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
+/* Paginació del rànquing i posició pròpia */
+let rankDocs = [], rankCursor = null, rankHasMore = false;
+async function rankPage(reset) {
+  let q = db.collection("ranking").orderBy("punts", "desc").limit(30);
+  if (!reset && rankCursor) q = q.startAfter(rankCursor);
+  const snap = await q.get();
+  if (reset) rankDocs = [];
+  snap.docs.forEach(d => rankDocs.push({ id: d.id, ...d.data() }));
+  rankCursor = snap.docs.length ? snap.docs[snap.docs.length - 1] : rankCursor;
+  rankHasMore = snap.docs.length === 30;
+}
+async function comptar(q) {
+  try { if (typeof q.count === "function") { const s = await q.count().get(); return s.data().count; } } catch (e) {}
+  const s = await q.get(); return s.size;
+}
+async function posicio(punts) {
+  const [davant, total] = await Promise.all([comptar(db.collection("ranking").where("punts", ">", punts)), comptar(db.collection("ranking"))]);
+  return { pos: davant + 1, total };
+}
+function myBest() { try { return JSON.parse(localStorage.getItem("cistella-mine-v2") || "null"); } catch (e) { return null; } }
+function setMyBest(e) { const b = myBest(); if (!b || e.punts > b.punts) { try { localStorage.setItem("cistella-mine-v2", JSON.stringify(e)); } catch (x) {} } }
+function rankRow(e, pos, me) { return `<li class="${me ? "me" : ""}"><span class="pos">${pos}</span><span>${esc(e.nom)}</span><b>${e.punts}</b></li>`; }
+async function drawGlobal() {
+  const L = $("rlist"), mine = myBest();
+  const isMe = e => (lastSaved && e.id === lastSaved.id) || (mine && e.id === mine.id);
+  if (!rankDocs.length) { L.innerHTML = `<li class="empty">${t("rankEmpty")}</li>`; $("btnMore").hidden = true; return; }
+  L.innerHTML = rankDocs.map((e, i) => rankRow(e, i + 1, isMe(e))).join("");
+  $("btnMore").hidden = !rankHasMore;
+  if (mine && mine.id && !rankDocs.some(e => e.id === mine.id)) {
+    try {
+      const { pos, total } = await posicio(mine.punts);
+      L.innerHTML += `<li class="gap">···</li>${rankRow(mine, pos, true)}<li class="mypos">${t("yourPos", pos, total)}</li>`;
+    } catch (e) {}
+  }
+}
+$("btnMore").onclick = async () => { $("btnMore").disabled = true; try { await rankPage(false); await drawGlobal(); } catch (e) {} $("btnMore").disabled = false; };
 
 async function showRank(tab) {
   await dbReady;
@@ -1529,17 +1572,17 @@ async function showRank(tab) {
   document.querySelectorAll("#rankTabs button").forEach(b => b.setAttribute("aria-pressed", b.dataset.t === rankTab));
   $("rank").hidden = false; $("rank").scrollTop = 0;
   const L = $("rlist");
-  const row = (e, me) => `<li class="${me ? "me" : ""}"><span>${esc(e.nom)}</span><b>${e.punts}</b></li>`;
+  $("btnMore").hidden = true;
   if (rankTab === "local") {
     const r = localRank();
-    L.innerHTML = r.length ? r.map(e => row(e, lastSaved && e.t === lastSaved.t)).join("") : `<li class="empty">${t("localEmpty")}</li>`;
+    L.innerHTML = r.length ? r.map((e, i) => rankRow(e, i + 1, lastSaved && e.t === lastSaved.t)).join("") : `<li class="empty">${t("localEmpty")}</li>`;
     if (!db) L.innerHTML += `<li class="empty">${t("noFirebase")}</li>`;
     return;
   }
   L.innerHTML = `<li class="empty">${t("loading")}</li>`;
   try {
-    const r = await globalRank();
-    L.innerHTML = r.length ? r.map(e => row(e, lastSaved && e.id === lastSaved.id)).join("") : `<li class="empty">${t("rankEmpty")}</li>`;
+    await rankPage(true);
+    await drawGlobal();
   } catch (e) {
     L.innerHTML = `<li class="empty">${t("rankFailConn")}</li>`;
   }
@@ -1560,7 +1603,9 @@ $("saveForm").addEventListener("submit", async e => {
     try {
       const ref = await db.collection("ranking").add({ nom, punts: st.score, encerts: st.hits, data: firebase.firestore.FieldValue.serverTimestamp() });
       lastSaved.id = ref.id;
+      setMyBest({ id: ref.id, nom, punts: st.score });
       $("savedMsg").textContent = t("saved");
+      try { const { pos, total } = await posicio(st.score); $("savedMsg").textContent = t("savedPos", pos, total); } catch (err) {}
     } catch (err) { $("savedMsg").textContent = t("savedLocalFail"); }
   } else $("savedMsg").textContent = t("savedLocal");
   showRank(db ? "global" : "local");

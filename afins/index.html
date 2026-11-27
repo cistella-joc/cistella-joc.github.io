@@ -307,8 +307,30 @@ DECKS.lleure.cartes.push(
   ["Anar de compres", "🛍️"], ["Els centres comercials", "🏬"], ["Els festivals de cinema", "🎞️"], ["Les visites guiades", "🧭"], ["Les fires medievals", "🛡️"],
   ["Sopar a la fresca", "🌙"], ["Mirar les estrelles", "🔭"]
 );
+DECKS.nadal = { nom: "Nadal", e: "🎄", d: "Tradicions, menjars i manies de les festes", cartes: [
+  ["Fer cagar el tió", "🪵"], ["Els torrons", "🍫"], ["El torró de Xixona", "🍯"], ["L'escudella de Nadal", "🍲"], ["La carn d'olla", "🍖"],
+  ["Els canelons de Sant Esteve", "🫕"], ["Fer el pessebre", "🐑"], ["El caganer", "💩"], ["L'arbre de Nadal", "🎄"], ["Els llums de Nadal", "✨"],
+  ["Les nadales", "🎶"], ["Els Pastorets", "😇"], ["La fira de Santa Llúcia", "🛍️"], ["L'amic invisible", "🎁"], ["La loteria de Nadal", "🎟️"],
+  ["El raïm de Cap d'Any", "🍇"], ["Les campanades", "🔔"], ["La cavalcada de Reis", "👑"], ["El tortell de Reis", "🍩"], ["Comprar regals a última hora", "🛒"],
+  ["Embolicar regals", "🎀"], ["Els jerseis de Nadal", "🧶"], ["Les pel·lis de Nadal", "🎬"], ["Els anuncis de Nadal", "📺"], ["Els dinars familiars llargs", "🍽️"],
+  ["Les postals de Nadal", "💌"], ["La neu per Nadal", "☃️"], ["Els propòsits d'any nou", "📝"], ["La festa de Cap d'Any", "🥳"], ["Quedar-se a casa per Cap d'Any", "🛋️"],
+  ["El cava a les dotze", "🍾"], ["Els polvorons", "🍪"], ["Les neules", "🥢"], ["El marisc per Nadal", "🦐"], ["Els barrets de pare Noel", "🎅"],
+  ["El concert de Cap d'Any", "🎻"], ["Les vacances de Nadal", "🏖️"], ["Els calendaris d'advent", "📅"], ["Patinar sobre gel", "⛸️"], ["Regalar diners", "💸"],
+  ["Els regals pràctics", "🧦"], ["Obrir els regals el dia 25", "🎁"], ["Els mitjons a la xemeneia", "🧦"], ["Cantar nadales en família", "🎤"], ["Les sobretaules de Nadal", "⏳"]
+] };
+DECKS.feina = { nom: "Sopar d'empresa", e: "💼", d: "Per riure una estona amb els companys de feina", cartes: [
+  ["El teletreball", "🏠"], ["Les reunions", "👥"], ["Les reunions que podien ser un correu", "📧"], ["Els correus amb tothom en còpia", "📨"], ["El cafè de la màquina", "☕"],
+  ["Esmorzar amb els companys", "🥐"], ["Dinar davant l'ordinador", "💻"], ["L'oficina oberta", "🏢"], ["Treballar amb música", "🎧"], ["Les videotrucades", "📹"],
+  ["La càmera encesa", "📷"], ["Els dilluns a primera hora", "😴"], ["Els divendres a la tarda", "🎉"], ["Parlar en públic", "🎤"], ["Els fulls de càlcul", "📊"],
+  ["Les llistes de tasques", "✅"], ["Treballar en equip", "🤝"], ["Treballar sol", "🧑‍💻"], ["Les formacions", "🎓"], ["Els viatges de feina", "🧳"],
+  ["Fer una cervesa després de la feina", "🍻"], ["El sopar d'empresa", "🍽️"], ["L'amic invisible de la feina", "🎁"], ["Les plantes de l'oficina", "🪴"], ["L'aire condicionat fort", "🥶"],
+  ["Els post-its", "🗒️"], ["Desconnectar el mòbil el cap de setmana", "📵"], ["Contestar correus de vacances", "🏖️"], ["Arribar d'hora", "🌅"], ["Plegar puntual", "⏰"],
+  ["El grup de WhatsApp de la feina", "💬"], ["Les sigles i l'argot de la feina", "🔤"], ["Les pissarres plenes de fletxes", "🖊️"], ["La intel·ligència artificial", "🤖"], ["Els horaris flexibles", "🕰️"],
+  ["La jornada intensiva d'estiu", "☀️"], ["Els aniversaris a l'oficina", "🎂"], ["Portar carmanyola", "🥡"], ["Els uniformes", "👔"], ["Els dinars de feina", "🍝"]
+] };
 DECKS.barreja = { nom: "Barreja", e: "🥗", d: "Una mica de cada tema, per a qui no es decideix", cartes: [] };
 Object.values(DECKS).forEach(d => { if (d.cartes.length) d.d += ` · ${d.cartes.length} targetes`; });
+{ const ord = ["nadal", "feina", "tot", "musica", "taula", "lleure", "barreja"], o = {}; ord.forEach(k => o[k] = DECKS[k]); Object.keys(DECKS).forEach(k => delete DECKS[k]); Object.assign(DECKS, o); }
 DECKS.barreja.d += ` · ${Object.values(DECKS).reduce((s, d) => s + d.cartes.length, 0)} targetes`;
 
 const COLORS = ["#f7c9a8", "#c9e2bf", "#f4d58d", "#cfd8f2", "#f2c2c9", "#d9cbea", "#bfe3dd", "#f6d1b0"];
@@ -330,7 +352,7 @@ const salaRef = c => db.collection("sales").doc(c);
 /* ------------------ Estat ------------------ */
 const $ = id => document.getElementById(id);
 const esc = t => String(t).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-let S = { codi: null, deck: "tot", me: null, host: false, sala: null, jugadors: [], resp: "", i: 0, unsub: [] };
+let S = { codi: null, deck: "nadal", me: null, host: false, sala: null, jugadors: [], resp: "", i: 0, unsub: [] };
 const LETTERS = "ABCDEFGHJKLMNPQRSTUVWXYZ";
 
 function show(id) {
@@ -534,7 +556,8 @@ function vota(v) {
   const back = $("stage").querySelector(".card.back"); if (back) { back.classList.add("anim"); back.classList.remove("back"); }
   S.resp += v; S.i++;
   const total = S.sala.cartes.length, fet = S.i >= total;
-  salaRef(S.codi).collection("jugadors").doc(S.me.id).update(fet ? { resp: S.resp, fet: true } : { resp: S.resp }).catch(() => {});
+  // s'envia cada 5 targetes i al final: molta menys feina per a la base de dades
+  if (fet || S.i % 5 === 0) salaRef(S.codi).collection("jugadors").doc(S.me.id).update(fet ? { resp: S.resp, fet: true } : { resp: S.resp }).catch(() => {});
   setTimeout(() => { if (fet) render(); else renderCards(); }, 230);
 }
 $("bSi").onclick = () => vota("1");
